@@ -4,11 +4,56 @@
   The FriendsCtrl pulls data from the Friends service (service.js)
   The Friends service returns an array of friend data
 -->
-<ion-view view-title="{{chat.name}}">
-  <ion-content class="padding">
-    <img ng-src="{{chat.face}}" style="width: 64px; height: 64px">
-    <p>
-      {{chat.lastText}}
-    </p>
+<ion-view view-title="단말기">
+
+  <div class="cover_image" style="background-image:url('{{device.image}}');"></div>
+  <ion-content>
+      <div class="padding has_cover">
+        <div class="button-bar">
+          <a class="button button-small button-light" ng-click="active_tab = 'device'" ng-class="{'button-positive':active_tab == 'device'}">기기정보</a>
+          <a class="button button-small button-light" ng-click="active_tab = 'sequence'" ng-class="{'button-positive':active_tab == 'sequence'}">시퀀스정보</a>
+        </div>
+        <br />
+
+        <!--device tab-->
+        <div ng-show="active_tab == 'device'">
+            <div class="whiteBox padding">
+              <h5>
+                {{device.name}}
+              </h5>
+              <hr />
+              <p>
+                {{device.content}}
+              </p>
+            </div>
+        </div>
+
+        <!--sequence tab-->
+        <div ng-show="active_tab == 'sequence'">
+        <p class="help-block">사용중인 시퀀스</p>
+          <h5>
+            {{device.sequence}}</h5>
+        <ion-list>
+          <ion-item>
+            타임라인 보기
+            <span class="item-note">
+              <i class="ion-ios-arrow-right"></i>
+            </span>
+          </ion-item>
+          <ion-item>
+            다른 시퀀스로 변경
+            <span class="item-note">
+              <i class="ion-ios-arrow-right"></i>
+            </span>
+          </ion-item>
+          <ion-item>
+            새로운 시퀀스 만들기
+            <span class="item-note">
+              <i class="ion-ios-arrow-right"></i>
+            </span>
+          </ion-item>
+        </ion-list>
+        </div>
+      </div>
   </ion-content>
 </ion-view>

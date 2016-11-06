@@ -1,47 +1,46 @@
-angular.module('starter.services', [])
+angular.module('xisodip.services', [])
 
-.factory('Chats', function() {
+.factory('devices', function() {
   // Might use a resource here that returns a JSON array
 
   // Some fake testing data
-  var chats = [{
-    id: 0,
-    name: 'Ben Sparrow',
-    lastText: 'You on your way?',
-    face: 'img/ben.png'
+  var devices = [{
+    srl: 0,
+    name: 'Samsung Galaxy Note 10.1',
+    sequence: '테스트용 시퀀스1',
+    content: '부경대학교 정문 주차장옆에 설치된 갤럭시 노트 10.1',
+    image: 'img/note101.jpg'
   }, {
-    id: 1,
-    name: 'Max Lynx',
-    lastText: 'Hey, it\'s me',
-    face: 'img/max.png'
+    srl: 1,
+    name: 'LG GPAD 7.0',
+    content: '사관학교 엘리베이터 내부 광고용 디스플레이',
+    sequence: '테스트용 시퀀스2',
+    image: 'img/gpad.jpg'
   }, {
-    id: 2,
-    name: 'Adam Bradleyson',
-    lastText: 'I should buy a boat',
-    face: 'img/adam.jpg'
+    srl: 2,
+    name: 'LG GPAD 7.0',
+    content: '본관 1층 광고용 디스플레이',
+    sequence: '테스트용 시퀀스1',
+    image: 'img/gpad.jpg'
   }, {
-    id: 3,
-    name: 'Perry Governor',
-    lastText: 'Look at my mukluks!',
-    face: 'img/perry.png'
-  }, {
-    id: 4,
-    name: 'Mike Harrington',
-    lastText: 'This is wicked good ice cream.',
-    face: 'img/mike.png'
+    srl: 3,
+    name: 'Samsung Galaxy Note 10.1',
+    sequence: '테스트용 시퀀스3',
+    content: '후문 옆 버스정류장 (건너편)에 설치한 디스플레이',
+    image: 'img/note101.jpg'
   }];
 
   return {
     all: function() {
-      return chats;
+      return devices;
     },
-    remove: function(chat) {
-      chats.splice(chats.indexOf(chat), 1);
+    remove: function(device) {
+      devices.splice(devices.indexOf(device), 1);
     },
-    get: function(chatId) {
-      for (var i = 0; i < chats.length; i++) {
-        if (chats[i].id === parseInt(chatId)) {
-          return chats[i];
+    get: function(deviceSrl) {
+      for (var i = 0; i < devices.length; i++) {
+        if (devices[i].srl === parseInt(deviceSrl)) {
+          return devices[i];
         }
       }
       return null;
