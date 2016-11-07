@@ -1,17 +1,52 @@
-<ion-view view-title="시퀀스관리">
-  <ion-content class="padding">
-    <h2>Welcome to Ionic</h2>
-    <p>
-      This is the Ionic starter for tabs-based apps. For other starters and ready-made templates, check out the <a href="http://market.ionic.io/starters" target="_blank">Ionic Market</a>.
-    </p>
-    <p>
-      To edit the content of each tab, edit the corresponding template file in <code>www/templates/</code>. This template is <code>www/templates/tab-dash.html</code>
-    </p>
-    <p>
-      If you need help with your app, join the Ionic Community on the <a href="http://forum.ionicframework.com" target="_blank">Ionic Forum</a>. Make sure to <a href="http://twitter.com/ionicframework" target="_blank">follow us</a> on Twitter to get important updates and announcements for Ionic developers.
-    </p>
-    <p>
-      For help sending push notifications, join the <a href="https://apps.ionic.io/signup" target="_blank">Ionic Platform</a> and check out <a href="http://docs.ionic.io/docs/push-overview" target="_blank">Ionic Push</a>. We also have other services available.
-    </p>
+<ion-view view-title="시퀀스 관리">
+  <ion-nav-buttons side="primary">
+    <h1 class="title"></h1>
+    <div class="buttons">
+      <button class="button button-icon" ng-click="addSequence()"><i class="icon ion-ios-plus-empty"></i></button>
+    </div>
+  </ion-nav-buttons>
+  <ion-content>
+    <ion-list show-delete="shouldShowDelete">
+      <ion-item class="item-remove-animate item-thumbnail-left item-icon-right" ng-repeat="sequence in sequences" type="item-text-wrap" href="#/dip/sequence/{{sequence.srl}}">
+        <img ng-src="{{sequence.main_image}}" height="30">
+        <h2>{{sequence.title}}</h2>
+        <br />
+        <p>{{sequence.text_clip}}</p>
+        <p class="help-block"><b>러닝타임</b> {{sequence.running_time}}</p>
+        <i class="icon ion-chevron-right icon-accessory"></i>
+
+        <ion-option-button class="button-assertive" ng-click="remove(sequence)">
+          Delete
+        </ion-option-button>
+      </ion-item>
+    </ion-list>
+
+
+    <script id="sequence-add.html" type="text/ng-template">
+      <ion-modal-view style="background:#eeeeee;">
+        <ion-header-bar>
+          <h1 class="title">시퀀스 추가</h1>
+          <div class="buttons">
+            <button class="button-icon" ng-click="closeAddDevice()"><i class="icon ion-ios-close-empty"></i></button>
+          </div>
+        </ion-header-bar>
+        <ion-content>
+          <div class="padding">
+            <p class="help-block">새로운 빈 시퀀스를 생성합니다.</p>
+          </div>
+          <div class="list">
+            <label class="item item-input">
+              <input type="text" placeholder="시퀀스 제목">
+            </label>
+          </div>
+          <div class="padding">
+            <button class="button button-blok button-positive button-small">
+              빈 시퀀스 생성
+            </button>
+          </div>
+        </ion-content>
+      </ion-modal-view>
+    </script>
+
   </ion-content>
 </ion-view>

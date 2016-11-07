@@ -4,11 +4,42 @@
   The FriendsCtrl pulls data from the Friends service (service.js)
   The Friends service returns an array of friend data
 -->
-<ion-view view-title="{{chat.name}}">
+<ion-view view-title="{{sequence.title}}">
+
+  <div class="cover_image" style="background-image:url('{{sequence.main_image}}');"></div>
   <ion-content class="padding">
-    <img ng-src="{{chat.face}}" style="width: 64px; height: 64px">
-    <p>
-      {{chat.lastText}}
-    </p>
+    <div class="padding has_cover">
+      <h5>포함된 텍스트 클립</h5>
+      <p>
+        {{sequence.text_clip}}
+      </p>
+      <br />
+      <h5> 타임라인 - {{sequence.running_time}}
+        <a ng-show="!shouldShowReorder" ng-click="shouldShowReorder = !shouldShowReorder" style="float:right;">순서편집</a>
+        <a ng-show="shouldShowReorder" ng-click="shouldShowReorder = !shouldShowReorder" style="float:right;">완료</a>
+      </h5>
+
+      <ion-list show-reorder="shouldShowReorder">
+        <ion-item class="item-remove-animate item-thumbnail-left item-icon-right" ng-repeat="play_list in sequence.play_list">
+          <img ng-src="{{play_list.thumbnail}}" />
+          <h2>{{play_list.title}}</h2>
+          <p class="help-block">{{play_list.type}}</p>
+          <p class="help-block"><b>러닝타임</b> {{play_list.time}}</p>
+          <p class="help-block"><b>전환효과</b> {{play_list.transition}}</p>
+
+          <ion-option-button class="button-assertive" ng-click="remove(play_list)">
+            클립 제거
+          </ion-option-button>
+          <ion-reorder-button class="ion-navicon" on-reorder="clipReorder(play_list, $fromIndex, $toIndex)">
+          </ion-reorder-button>
+
+        </ion-item>
+        <ion-item ng-click="addClip()">
+              <i class="icon ion-ios-plus-empty"></i> 클립 추가
+        </ion-item>
+      </ion-list>
+      <button class="button button-positive button-small button-block" ng-click="saveSequence()">
+        <i class="icon ion-ios-browsers-outline"></i> 이 시퀀스를 저장하고 발행합니다.</button>
+    </div>
   </ion-content>
 </ion-view>

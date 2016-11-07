@@ -17,42 +17,74 @@
 
         <!--device tab-->
         <div ng-show="active_tab == 'device'">
+            <p class="help-block"><b>디바이스 종류</b></p>
             <div class="whiteBox padding">
-              <h5>
-                {{device.name}}
-              </h5>
-              <hr />
-              <p>
-                {{device.content}}
-              </p>
+              {{device.name}}
             </div>
+            <div class="whiteBox padding" style="border-top:none;">
+              <p class="help-block">{{device.content}}</p>
+            </div>
+            <br />
+
+            <p class="help-block"><b>Object ID</b></p>
+            <div class="whiteBox padding">
+              0x3987IOSA
+            </div>
+            <br />
+
+            <p class="help-block"><b>상태</b></p>
+            <div class="item item-icon-right">
+              온라인
+              <span class="item-note">
+                네트워크 상태를 갱신합니다.
+              </span>
+              <i class="icon ion-ios-refresh-empty"></i>
+            </div>
+            <br />
+
         </div>
 
         <!--sequence tab-->
         <div ng-show="active_tab == 'sequence'">
-        <p class="help-block">사용중인 시퀀스</p>
           <h5>
             {{device.sequence}}</h5>
         <ion-list>
-          <ion-item>
-            타임라인 보기
+          <ion-item class="item-icon-left">
+            <i class="icon ion-edit"></i>
+            타임라인 보기/편집
             <span class="item-note">
               <i class="ion-ios-arrow-right"></i>
             </span>
           </ion-item>
-          <ion-item>
+          <ion-item class="item-icon-left">
+            <i class="icon ion-ios-list-outline"></i>
             다른 시퀀스로 변경
             <span class="item-note">
               <i class="ion-ios-arrow-right"></i>
             </span>
           </ion-item>
-          <ion-item>
+          <ion-item class="item-icon-left">
+
+            <i class="icon ion-ios-plus-empty"></i>
             새로운 시퀀스 만들기
             <span class="item-note">
               <i class="ion-ios-arrow-right"></i>
             </span>
           </ion-item>
         </ion-list>
+          <br />
+          <p class="help-block"><b>러닝타임</b><br />
+            216분 22초
+          </p>
+          <br />
+          <p class="help-block"><b>포함된 텍스트클립</b><br />
+            (주)소프트기어에서 개발한 XisoDIP 시스템 입니다.
+            공을 오늘도 수치감에얼굴이 싶은대로 때리자, 하고는 가자,리나!아,아 때 혼나기 옷을 화원 아들의 리나가 덜아가시고나서 목소리가 자지를 하지는 두영이가 생각을 문지르자 흥분을 과일 하면서
+            계곡이 못하고 안으로 얼굴이 쪼그리고 안입어서 들린다엄마, 먹으면 없는 만들어 차려져 무릎을 하나 난다엄마가 나와서 말 앞으로 빨기시작했다다시 받지 진숙은 내 하고 나고 해알았어,,리
+
+
+          </p>
+
         </div>
       </div>
   </ion-content>
