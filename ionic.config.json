@@ -1,4 +1,10 @@
 {
   "name": "xisodip",
-  "app_id": ""
+  "app_id": "",
+  "proxies": [
+    {
+      "path": "/api",
+      "proxyUrl": "http://xisodip.xiso.co.kr/"
+    }
+  ]
 }

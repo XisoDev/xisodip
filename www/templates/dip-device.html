@@ -2,15 +2,15 @@
   <ion-nav-buttons side="primary">
       <h1 class="title"></h1>
       <div class="buttons">
-        <button class="button button-icon" ng-click="addDevice()"><i class="icon ion-ios-plus-empty"></i></button>
+        <button class="button button-icon" ng-click="showAddDevice()"><i class="icon ion-ios-plus-empty"></i></button>
       </div>
   </ion-nav-buttons>
   <ion-content>
     <ion-list show-delete="shouldShowDelete">
-      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="device in devices" type="item-text-wrap" href="#/dip/device/{{device.srl}}">
-        <img ng-src="{{device.image}}">
-        <h2>{{device.content}}</h2>
-        <p>{{device.sequence}}</p>
+      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="device in devices" type="item-text-wrap" href="#/dip/deviceDetail/{{device.player_srl}}">
+        <img ng-src="{{device.seq_main_img.thumb_filename || '/files/no_image.png' | makeImgSrc}}">
+        <h2>{{device.title}}</h2>
+        <p>{{device.seq_title || '선택된 시퀀스가 없습니다'}}</p>
         <i class="icon ion-chevron-right icon-accessory"></i>
 
         <ion-option-button class="button-assertive" ng-click="remove(device)">
@@ -41,7 +41,7 @@
               <input type="password" placeholder="비밀번호">
             </label>
             <label class="item item-input">
-              <textarea placeholder="단말기 설명"></textarea>
+              <textarea placeholder="단말기 설명" rows="3"></textarea>
             </label>
           </div>
           <div class="padding">

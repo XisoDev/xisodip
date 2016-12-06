@@ -1,9 +1,10 @@
 <ion-view view-title="설정">
-  <ion-content>
-    <ion-list>
-      <ion-toggle  ng-model="settings.enableFriends">
-        토글설정 1
-      </ion-toggle>
-    </ion-list>
-  </ion-content>
+    <ion-content>
+        <ion-list>
+            <ion-toggle  ng-model="settings.enableFriends">
+                토글설정 1
+            </ion-toggle>
+            <ion-item ng-click="logout()">로그아웃</ion-item>
+        </ion-list>
+    </ion-content>
 </ion-view>

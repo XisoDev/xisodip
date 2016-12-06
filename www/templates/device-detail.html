@@ -1,12 +1,7 @@
-<!--
-  This template loads for the 'tab.friend-detail' state (app.js)
-  'friend' is a $scope variable created in the FriendsCtrl controller (controllers.js)
-  The FriendsCtrl pulls data from the Friends service (service.js)
-  The Friends service returns an array of friend data
--->
-<ion-view view-title="단말기">
+<ion-view cache-view="false">
+    <ion-nav-title>{{device.title}}</ion-nav-title>
 
-  <div class="cover_image" style="background-image:url('{{device.image}}');"></div>
+    <div class="cover_image" style="background-image : url('{{sequence.main_img.thumb_filename || '/files/no_image.png' | makeImgSrc}}')"></div>
   <ion-content>
       <div class="padding has_cover">
         <div class="button-bar">
@@ -22,17 +17,15 @@
               {{device.name}}
             </div>
             <div class="whiteBox padding" style="border-top:none;">
-              <p class="help-block">{{device.content}}</p>
+              <p class="help-block" ng-bind-html="device.desc | nl2br"></p>
             </div>
             <br />
 
             <p class="help-block"><b>Object ID</b></p>
-            <div class="whiteBox padding">
-              0x3987IOSA
-            </div>
+            <div class="whiteBox padding">{{device.obj_id}}</div>
             <br />
 
-            <p class="help-block"><b>상태</b></p>
+            <!--<p class="help-block"><b>상태</b></p>
             <div class="item item-icon-right">
               온라인
               <span class="item-note">
@@ -40,52 +33,85 @@
               </span>
               <i class="icon ion-ios-refresh-empty"></i>
             </div>
-            <br />
+            <br />-->
 
         </div>
 
         <!--sequence tab-->
         <div ng-show="active_tab == 'sequence'">
-          <h5>
-            {{device.sequence}}</h5>
-        <ion-list>
-          <ion-item class="item-icon-left">
-            <i class="icon ion-edit"></i>
-            타임라인 보기/편집
-            <span class="item-note">
-              <i class="ion-ios-arrow-right"></i>
-            </span>
-          </ion-item>
-          <ion-item class="item-icon-left">
-            <i class="icon ion-ios-list-outline"></i>
-            다른 시퀀스로 변경
-            <span class="item-note">
-              <i class="ion-ios-arrow-right"></i>
-            </span>
-          </ion-item>
-          <ion-item class="item-icon-left">
+          <h5>{{sequence.title || '선택된 시퀀스가 없습니다'}}</h5>
+            <ion-list>
+              <ion-item class="item-icon-left" ng-click="goSequence()" ng-if="sequence">
+                <i class="icon ion-edit"></i>
+                타임라인 보기/편집
+                <span class="item-note">
+                  <i class="ion-ios-arrow-right"></i>
+                </span>
+              </ion-item>
 
-            <i class="icon ion-ios-plus-empty"></i>
-            새로운 시퀀스 만들기
-            <span class="item-note">
-              <i class="ion-ios-arrow-right"></i>
-            </span>
-          </ion-item>
-        </ion-list>
-          <br />
-          <p class="help-block"><b>러닝타임</b><br />
-            216분 22초
-          </p>
-          <br />
-          <p class="help-block"><b>포함된 텍스트클립</b><br />
-            (주)소프트기어에서 개발한 XisoDIP 시스템 입니다.
-            공을 오늘도 수치감에얼굴이 싶은대로 때리자, 하고는 가자,리나!아,아 때 혼나기 옷을 화원 아들의 리나가 덜아가시고나서 목소리가 자지를 하지는 두영이가 생각을 문지르자 흥분을 과일 하면서
-            계곡이 못하고 안으로 얼굴이 쪼그리고 안입어서 들린다엄마, 먹으면 없는 만들어 차려져 무릎을 하나 난다엄마가 나와서 말 앞으로 빨기시작했다다시 받지 진숙은 내 하고 나고 해알았어,,리
+              <ion-item class="item-icon-left" ng-click="showMdSeqChg()">
+                <i class="icon ion-ios-list-outline"></i>
+                다른 시퀀스로 변경
+                <span class="item-note">
+                  <i class="ion-ios-arrow-right"></i>
+                </span>
+              </ion-item>
 
-
-          </p>
-
+              <ion-item class="item-icon-left" ng-click="goNewSequence()">
+                <i class="icon ion-ios-plus-empty"></i>
+                새로운 시퀀스 만들기
+                <span class="item-note">
+                  <i class="ion-ios-arrow-right"></i>
+                </span>
+              </ion-item>
+            </ion-list>
+            <div ng-if="sequence">
+              <br />
+              <p class="help-block"><b>러닝타임</b><br />
+                {{sequence.total_time | toTime}}
+              </p>
+              <br />
+              <p class="help-block"><b>포함된 텍스트클립</b><br />
+                  <span ng-bind-html="sequence.text_clip | nl2br"></span>
+              </p>
+            </div>
         </div>
       </div>
   </ion-content>
+
+    <script id="sequence-change.html" type="text/ng-template">
+        <ion-modal-view>
+            <ion-header-bar>
+                <div class="buttons">
+                    <button class="button button-icon ion-ios-close-empty" ng-click="closeMdSeqChg()"></button>
+                </div>
+                <h1 class="title" ng-if="!showSearch">시퀀스 선택</h1>
+
+                <label class="item-input-wrapper title" style="text-align:left; height:auto; top:2px; left:35px; right:40px;" ng-if="showSearch">
+                    <input type="text" placeholder="시퀀스명으로 찾기..." ng-model="search.title" style="background: transparent; width: 100%; margin-top: 5px;"/>
+                </label>
+                <div class="buttons">
+                    <button class="button button-icon ion-ios-search" ng-click="showSearch = !showSearch; search.title=''"></button>
+                </div>
+            </ion-header-bar>
+            <ion-content class="padding">
+                <ion-list>
+                    <ion-item class="item-remove-animate item-thumbnail-left item-icon-right" ng-repeat="seq in sequences | filter:search:strict" type="item-text-wrap" ng-click="changeSequence(seq)">
+                        <img ng-src="{{seq.main_img.thumb_filename | makeImgSrc}}" height="30">
+                        <h2>{{seq.title}}</h2>
+                        <br />
+                        <p>{{seq.text_clip}}</p>
+                        <p class="help-block"><b>러닝타임</b> {{seq.total_time | toTime}}</p>
+                    </ion-item>
+                </ion-list>
+
+                <ion-infinite-scroll
+                        ng-if="moreDataCanBeLoaded"
+                        on-infinite="loadMore()">
+                </ion-infinite-scroll>
+            </ion-content>
+        </ion-modal-view>
+    </script>
+
+
 </ion-view>

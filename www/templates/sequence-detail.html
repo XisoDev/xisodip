@@ -1,45 +1,180 @@
-<!--
-  This template loads for the 'tab.friend-detail' state (app.js)
-  'friend' is a $scope variable created in the FriendsCtrl controller (controllers.js)
-  The FriendsCtrl pulls data from the Friends service (service.js)
-  The Friends service returns an array of friend data
--->
-<ion-view view-title="{{sequence.title}}">
+<ion-view cache-view="false">
+    <ion-nav-title>{{sequence.title}}</ion-nav-title>
+    <ion-nav-buttons side="right">
+        <button class="button button-clear" ng-click="showMainImg()">대표이미지</button>
+    </ion-nav-buttons>
 
-  <div class="cover_image" style="background-image:url('{{sequence.main_image}}');"></div>
-  <ion-content class="padding">
-    <div class="padding has_cover">
-      <h5>포함된 텍스트 클립</h5>
-      <p>
-        {{sequence.text_clip}}
-      </p>
-      <br />
-      <h5> 타임라인 - {{sequence.running_time}}
-        <a ng-show="!shouldShowReorder" ng-click="shouldShowReorder = !shouldShowReorder" style="float:right;">순서편집</a>
-        <a ng-show="shouldShowReorder" ng-click="shouldShowReorder = !shouldShowReorder" style="float:right;">완료</a>
-      </h5>
+    <div class="cover_image" style="background-image:url('{{sequence.main_img.thumb_filename | makeImgSrc}}');" ng-click="showSeqEdit()"></div>
+    <ion-content class="padding">
+        <div class="padding has_cover">
+            <h5>포함된 텍스트 클립 <i class="ion-edit" ng-click="showSeqEdit()" style="color:#999;"></i></h5>
+            <p ng-bind-html="sequence.text_clip | nl2br"></p>
+            <br />
+            <h5> 타임라인 - {{sequence.total_time | toTime}}
+                <a ng-show="!shouldShowReorder" ng-click="shouldShowReorder = !shouldShowReorder" style="float:right;">순서 편집</a>
+                <a ng-show="shouldShowReorder" ng-click="shouldShowReorder = !shouldShowReorder" style="float:right;">완료</a>
+            </h5>
 
-      <ion-list show-reorder="shouldShowReorder">
-        <ion-item class="item-remove-animate item-thumbnail-left item-icon-right" ng-repeat="play_list in sequence.play_list">
-          <img ng-src="{{play_list.thumbnail}}" />
-          <h2>{{play_list.title}}</h2>
-          <p class="help-block">{{play_list.type}}</p>
-          <p class="help-block"><b>러닝타임</b> {{play_list.time}}</p>
-          <p class="help-block"><b>전환효과</b> {{play_list.transition}}</p>
+            <ion-list show-reorder="shouldShowReorder" style="pointer-events: auto;">
+                <ion-item class="item-remove-animate item-thumbnail-left item-icon-right" ng-repeat="play_list in sequence.timeline">
+                    <img ng-src="{{play_list.thumb_filename | makeImgSrc}}" ng-click="showTimeEdit(play_list)" />
+                    <h2>
+                        {{play_list.title}}
+                    </h2>
+                    <p class="help-block">
+                        {{play_list.file_type}}
+                    </p>
+                    <p class="help-block">
+                        <b>러닝타임</b>
+                        {{play_list.duration}} 초
+                    </p>
+                    <p class="help-block">
+                        <b>전환효과</b>
+                        {{play_list.transition}}
+                    </p>
 
-          <ion-option-button class="button-assertive" ng-click="remove(play_list)">
-            클립 제거
-          </ion-option-button>
-          <ion-reorder-button class="ion-navicon" on-reorder="clipReorder(play_list, $fromIndex, $toIndex)">
-          </ion-reorder-button>
+                    <ion-option-button class="button-assertive" ng-click="removeTimeline($index)">
+                        클립 제거
+                    </ion-option-button>
+                    <ion-reorder-button class="ion-navicon" on-reorder="clipReorder(play_list, $fromIndex, $toIndex)">
+                    </ion-reorder-button>
 
-        </ion-item>
-        <ion-item ng-click="addClip()">
-              <i class="icon ion-ios-plus-empty"></i> 클립 추가
-        </ion-item>
-      </ion-list>
-      <button class="button button-positive button-small button-block" ng-click="saveSequence()">
-        <i class="icon ion-ios-browsers-outline"></i> 이 시퀀스를 저장하고 발행합니다.</button>
-    </div>
-  </ion-content>
+                </ion-item>
+                <ion-item ng-click="addClip()">
+                    <i class="icon ion-ios-plus-empty"></i> 클립 추가
+                </ion-item>
+            </ion-list>
+            <button class="button button-positive button-small button-block" ng-click="saveSequence()">
+                <i class="icon ion-ios-browsers-outline"></i> 이 시퀀스를 저장하고 발행합니다.</button>
+        </div>
+    </ion-content>
+
+
+    <script id="sequence-edit.html" type="text/ng-template">
+        <ion-modal-view style="background:#eeeeee;">
+            <ion-header-bar>
+                <div class="buttons">
+                    <button class="button-icon" ng-click="closeSeqEdit()"><i class="icon ion-ios-close-empty"></i></button>
+                </div>
+                <h1 class="title">시퀀스 정보 수정</h1>
+            </ion-header-bar>
+            <ion-content>
+                <div class="padding">
+                    <p class="help-block">현재 시퀀스의 제목과 텍스트 클립을 수정합니다. 수정 후 저장해야 반영됩니다.</p>
+                </div>
+                <div class="list">
+                    <label class="item item-input">
+                        <input type="text" placeholder="시퀀스 제목" ng-model="sequence.title">
+                    </label>
+                    <label class="item item-input">
+                        <textarea placeholder="텍스트 클립" rows="3" ng-model="sequence.text_clip"></textarea>
+                    </label>
+                </div>
+                <div class="padding" ng-if="false">
+                    <button class="button button-block button-positive button-small">
+                        빈 시퀀스 생성
+                    </button>
+                </div>
+            </ion-content>
+        </ion-modal-view>
+    </script>
+
+
+    <script id="selectMainImg.html" type="text/ng-template">
+        <ion-modal-view style="background:#eeeeee;">
+            <ion-header-bar>
+                <div class="buttons">
+                    <button class="button-icon" ng-click="closeMainImg()"><i class="icon ion-ios-close-empty"></i></button>
+                </div>
+                <h1 class="title">대표 이미지 선택</h1>
+            </ion-header-bar>
+            <ion-content>
+                <div class="padding">
+                    <p class="help-block">현재 시퀀스의 대표 이미지를 선택합니다. 대표 이미지 선택 후 저장해야 반영됩니다.</p>
+                </div>
+                <div class="row responsive-md">
+                    <div class="col col-25" ng-repeat="time in sequence.timeline" ng-click="changeMainImg(time)">
+                        <img ng-src="{{time.thumb_filename | makeImgSrc}}" style="width:100%" />
+                    </div>
+                </div>
+            </ion-content>
+        </ion-modal-view>
+    </script>
+
+
+    <script id="selectClip.html" type="text/ng-template">
+        <ion-modal-view style="background:#eeeeee;">
+            <ion-header-bar>
+                <div class="buttons">
+                    <button class="button-icon" ng-click="closeClip()"><i class="icon ion-ios-close-empty"></i></button>
+                </div>
+                <h1 class="title">클립 선택</h1>
+                <label class="item-input-wrapper title" style="text-align:left; height:auto; top:2px; left:35px; right:40px;" ng-if="showSearch">
+                    <input type="text" placeholder="클립명으로 찾기..." ng-model="search.title" style="background: transparent; width: 100%; margin-top: 5px;"/>
+                </label>
+                <div class="buttons">
+                    <button class="button button-icon ion-ios-search" ng-click="showSearch = !showSearch; search.title=''"></button>
+                </div>
+            </ion-header-bar>
+            <ion-content>
+                <ion-list>
+                    <ion-item class="item-remove-animate item-thumbnail-left item-icon-right" ng-repeat="clip in clips | filter:search:strict" type="item-text-wrap" ng-click="addTimeline(clip)">
+                        <img ng-src="{{clip.thumb_filename | makeImgSrc}}" height="30">
+                        <h2>{{clip.title}}</h2>
+                        <br />
+                        <p class="help-block">{{clip.file_type}}</p>
+                        <p class="help-block">{{clip.source_filename}}</p>
+                    </ion-item>
+                </ion-list>
+
+                <ion-infinite-scroll
+                        ng-if="moreDataCanBeLoaded"
+                        on-infinite="loadMore()">
+                </ion-infinite-scroll>
+            </ion-content>
+        </ion-modal-view>
+    </script>
+
+
+    <script id="timeline-edit.html" type="text/ng-template">
+        <ion-modal-view style="background:#eeeeee;">
+            <ion-header-bar>
+                <div class="buttons">
+                    <button class="button-icon" ng-click="closeTimeEdit()"><i class="icon ion-ios-close-empty"></i></button>
+                </div>
+                <h1 class="title">타임라인 수정</h1>
+            </ion-header-bar>
+            <ion-content>
+                <div class="padding">
+                    <p class="help-block">현재 타임라인을 수정합니다. 수정 후 저장해야 반영됩니다.</p>
+                </div>
+                <div class="list card">
+                    <div class="item">
+                        <h2>{{selectClip.title}}</h2>
+                        <p>{{selectClip.file_type}}</p>
+                    </div>
+
+                    <div class="item item-image">
+                        <img ng-src="{{selectClip.thumb_filename | makeImgSrc}}">
+                    </div>
+
+                    <label class="item item-input">
+                        <span class="input-label">러닝타임</span>
+                        <span ng-show="selectClip.file_type.indexOf('video') == 0" style="color:gray;">{{selectClip.duration}}</span>
+                        <input ng-show="selectClip.file_type.indexOf('video') != 0" type="text" placeholder="러닝타임(초)" ng-model="selectClip.duration" >
+                    </label>
+                    <label class="item item-input">
+                        <span class="input-label">전환효과</span>
+                        <select ng-model="selectClip.transition"><option ng-repeat="tran in transitions" value="{{tran}}">{{tran}}</option></select>
+                    </label>
+                </div>
+                <div class="padding">
+                    <button class="button button-block button-positive button-small" ng-click="closeTimeEdit()">
+                        완료
+                    </button>
+                </div>
+            </ion-content>
+        </ion-modal-view>
+    </script>
+
 </ion-view>

@@ -1,22 +1,20 @@
-<!--
-Create tabs with an icon and label, using the tabs-positive style.
-Each tab's child <ion-nav-view> directive will have its own
-navigation history that also transitions its views in and out.
--->
 <ion-tabs class="tabs-icon-top tabs-color-active-positive">
 
-  <!-- Dashboard Tab -->
+  <!-- Device Tab -->
   <ion-tab title="단말기" icon-off="ion-ipad" icon-on="ion-ipad" href="#/dip/device">
+  <!--<ion-tab title="단말기" icon-off="ion-ipad" icon-on="ion-ipad" ng-click="goDevice()">-->
     <ion-nav-view name="dip-device"></ion-nav-view>
   </ion-tab>
 
-  <!-- Chats Tab -->
-  <ion-tab title="시퀀스" icon-off="ion-ios-film-outline" icon-on="ion-ios-film" href="#/dip/sequence">
+  <!-- Sequence Tab -->
+  <!--<ion-tab title="시퀀스" icon-off="ion-ios-film-outline" icon-on="ion-ios-film" href="#/dip/sequence">-->
+  <ion-tab title="시퀀스" icon-off="ion-ios-film-outline" icon-on="ion-ios-film" ng-click="goSequence()">
     <ion-nav-view name="dip-sequence"></ion-nav-view>
   </ion-tab>
 
-  <!-- Account Tab -->
-  <ion-tab title="설정" icon-off="ion-ios-gear-outline" icon-on="ion-ios-gear" href="#/dip/config">
+  <!-- Config Tab -->
+  <!--<ion-tab title="설정" icon-off="ion-ios-gear-outline" icon-on="ion-ios-gear" href="#/dip/config">-->
+  <ion-tab title="설정" icon-off="ion-ios-gear-outline" icon-on="ion-ios-gear" ng-click="goConfig()">
     <ion-nav-view name="dip-config"></ion-nav-view>
   </ion-tab>
 
