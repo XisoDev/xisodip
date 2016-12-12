@@ -36,6 +36,8 @@ angular.module('xisodip', ['ionic', 'ngCordova', 'xisodip.controllers', 'xisodip
 
     .filter('toTime', function() {
         return function(seconds) {
+            if(!seconds) return ;
+
             var oneMinute = 60;
             var oneHour = oneMinute * 60;
             var oneDay = oneHour * 24;
@@ -51,6 +53,21 @@ angular.module('xisodip', ['ionic', 'ngCordova', 'xisodip.controllers', 'xisodip
             if (seconds !== 0) timeString += seconds + '초 ';
 
             return timeString;
+        };
+    })
+
+    .filter('realTime', function() {
+        return function(timelines) {
+            if(!timelines) return ;
+            if(timelines.length == 0) return ;
+
+            var seconds = 0;
+
+            for(var key in timelines){
+                seconds = seconds + onum(timelines[key].duration);
+            }
+
+            return seconds;
         };
     })
 
@@ -127,13 +144,15 @@ angular.module('xisodip', ['ionic', 'ngCordova', 'xisodip.controllers', 'xisodip
 
 
             .state('dip.sequence-edit', {
-                url: '/sequenceEdit/:sequenceSrl',
+                // url: '/sequenceEdit/:sequenceSrl',
+                url: '/sequenceEdit',
                 views: {
                     'dip-sequence': {
                         templateUrl: 'templates/sequence-detail.html',
                         controller: 'sequenceDetailCtrl'
                     }
-                }
+                },
+                params: { params : { seq_srl: null, title: null, text_clip: null } }
             })
 
             .state('dip.config', {

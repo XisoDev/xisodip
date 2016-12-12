@@ -7,7 +7,7 @@
   </ion-nav-buttons>
   <ion-content>
     <ion-list show-delete="shouldShowDelete">
-      <ion-item class="item-remove-animate item-thumbnail-left item-icon-right" ng-repeat="sequence in sequences" type="item-text-wrap" href="#/dip/sequenceEdit/{{sequence.seq_srl}}">
+      <ion-item class="item-remove-animate item-thumbnail-left item-icon-right" ng-repeat="sequence in sequences" type="item-text-wrap" ng-click="goEdit(sequence.seq_srl)">
         <img ng-src="{{sequence.main_img.thumb_filename | makeImgSrc}}" height="30">
         <h2>{{sequence.title}}</h2>
         <br />
@@ -36,14 +36,14 @@
           </div>
           <div class="list">
             <label class="item item-input">
-              <input type="text" placeholder="시퀀스 제목">
+              <input type="text" placeholder="시퀀스 제목" ng-model="params.title">
             </label>
             <label class="item item-input">
-              <textarea placeholder="텍스트 클립" rows="3"></textarea>
+              <textarea placeholder="텍스트 클립" ng-model="params.text_clip" rows="3"></textarea>
             </label>
           </div>
           <div class="padding">
-            <button class="button button-block button-positive button-small">
+            <button class="button button-block button-positive button-small" ng-click="addSeq()">
               빈 시퀀스 생성
             </button>
           </div>

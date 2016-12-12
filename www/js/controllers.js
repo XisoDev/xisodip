@@ -38,9 +38,9 @@ angular.module('xisodip.controllers', [])
     })
 
     .controller('deviceCtrl', function($scope, Player, $ionicModal) {
-        $scope.$on('$ionicView.enter', function(e) {
-            $scope.init();
-        });
+        // $scope.$on('$ionicView.enter', function(e) {
+        //     $scope.init();
+        // });
 
         $scope.init = function(){
             Player.all().then(function(res){
@@ -71,12 +71,12 @@ angular.module('xisodip.controllers', [])
             $scope.mdDeviceAdd.hide();
         };
 
-        // $scope.init();
+        $scope.init();
 
     })
 
     .controller('deviceDetailCtrl', function($scope, $stateParams, $state, Player, Seq, $ionicModal, $cordovaToast) {
-        $scope.$on('$ionicView.enter', function(e) {
+        $scope.$on('$stateChangeSuccess', function(){
             // $scope.loadMore();
             $scope.sequences = [];
             $scope.page = 1;
@@ -166,12 +166,14 @@ angular.module('xisodip.controllers', [])
     })
 
 
-    .controller('sequenceCtrl', function($scope, $ionicModal, $stateParams, Seq) {
-        $scope.$on('$ionicView.enter', function(e) {
+    .controller('sequenceCtrl', function($scope, $ionicModal, $stateParams, Seq, $state) {
+        $scope.$on('$stateChangeSuccess', function(){
             if($stateParams.isNew) {
-                $scope.addSequence();
+                $scope.showAddSequence();
             }
         });
+
+        $scope.params = {};
 
         $scope.init = function(){
             Seq.all().then(function(res){
@@ -181,6 +183,22 @@ angular.module('xisodip.controllers', [])
                 console.log(res);
             });
 
+        };
+
+        $scope.goEdit = function(seq_srl){
+            $state.go('dip.sequence-edit', {params: {seq_srl: seq_srl}});
+        };
+
+        $scope.addSeq = function(){
+            if(!$scope.params.title) $cordovaToast.showShortBottom('시퀀스 제목을 입력하세요');
+            if(!$scope.params.text_clip) $cordovaToast.showShortBottom('텍스트 클립을 입력하세요');
+
+            // $scope.sequences.push(angular.copy($scope.params));
+            var params = angular.copy($scope.params);
+            $scope.params = {};
+            $scope.closeAddSequence();
+
+            $state.go('dip.sequence-edit', { params : params});
         };
 
         $scope.remove = function(sequence) {
@@ -203,15 +221,23 @@ angular.module('xisodip.controllers', [])
         $scope.init();
     })
 
-    .controller('sequenceDetailCtrl', function($scope, $stateParams, $state, Seq, $ionicActionSheet, $timeout, Transition, xiHttp, $ionicModal, File) {
-        $scope.$on('$ionicView.enter', function(e) {
+    .controller('sequenceDetailCtrl', function($scope, $stateParams, $state, Seq, $ionicActionSheet, $timeout, Transition, xiHttp, $ionicModal, File, $cordovaCamera, $ionicPlatform, $ionicLoading, xisoConfig) {
+
+        $scope.$on('$stateChangeSuccess', function(){
+            if($stateParams.params.title || $stateParams.params.text_clip) {
+                $scope.sequence = $stateParams.params;
+                $scope.sequence.timeline = [];
+            }
+
+            if($stateParams.params.seq_srl) {
+                Seq.get($stateParams.params.seq_srl).then(function (res) {
+                    $scope.sequence = res.data;
+                });
+            }
+
             $scope.clips = [];
             $scope.page = 1;
             $scope.loadMore();
-        });
-
-        Seq.get($stateParams.sequenceSrl).then(function(res){
-            $scope.sequence = res.data;
         });
 
         $scope.transitions = Transition.all();
@@ -258,10 +284,10 @@ angular.module('xisodip.controllers', [])
                 buttonClicked: function(index) {
                     switch(index){
                         case 0:
-                            $scope.showClip();
+                            $scope.getPhotoLib('picture');
                             break;
                         case 1:
-                            $scope.showClip();
+                            $scope.getPhotoLib('video');
                             break;
                         case 2:
                             $scope.showClip();
@@ -295,8 +321,91 @@ angular.module('xisodip.controllers', [])
         };
 
         $scope.addTimeline = function(clip){
-            $scope.sequence.timeline.push(angular.copy(clip));
+            var cloneClip = angular.copy(clip);
+            if(!cloneClip.duration) cloneClip.duration = 3;
+            if(!cloneClip.transition) cloneClip.transition = 'slide-up';
+            $scope.sequence.timeline.push(cloneClip);
             $scope.closeClip();
+        };
+
+        $scope.getPhotoLib = function (media_type) {
+            // $ionicScrollDelegate.scrollTop();
+            $scope.uploadList = false;
+            $ionicPlatform.ready(function() {
+
+                var options;
+
+                if(media_type=='picture'){
+                    options = {
+                        quality: 100,
+                        destinationType: Camera.DestinationType.FILE_URI,
+                        sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
+                        mediaType: Camera.MediaType.PICTURE,
+                        encodingType: Camera.EncodingType.JPEG,
+                        targetWidth: 300,
+                        targetHeight: 300,
+                        popoverOptions: CameraPopoverOptions,
+                        allowEdit: false,
+                        saveToPhotoAlbum: false
+                    };
+                }else if(media_type=='video'){
+                    options = {
+                        quality: 100,
+                        destinationType: Camera.DestinationType.FILE_URI,
+                        sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
+                        mediaType:Camera.MediaType.VIDEO
+                    };
+                }
+
+                $cordovaCamera.getPicture(options).then(function (imageURI) {
+                    $ionicLoading.show({
+                        template: '생성 중..',
+                        duration: 10000
+                    });
+                    $scope.cameraimage = imageURI;
+                    $scope.UploadDoc();
+                }, function (err) {
+                    console.log(err);
+                });
+            }, false);
+        };
+
+        $scope.UploadDoc = function () {
+            var fileURL = $scope.cameraimage;
+            var fileName = fileURL.substr(fileURL.lastIndexOf('/') + 1);
+            var ext = fileURL.substr(fileURL.lastIndexOf('.') + 1);
+            var mimeType = mime_list[ext.toLowerCase()];
+            console.log('fileName = ' + fileName);
+            console.log('mimetype = ' + mimeType);
+
+            var options = new FileUploadOptions();
+            options.fileKey = "file";
+            options.fileName = fileName;
+            options.mimeType = mimeType;
+            options.chunkedMode = false;    //Nginx 서버에 업로드 하는 문제를 방지 하려면.
+
+            var params = {};
+            params.title = options.fileName;
+            options.params = params;
+            var ft = new FileTransfer();
+            ft.upload(fileURL, encodeURI("http://172.30.1.4:8100" + xisoConfig.url + "/proc.php?module=file&act=procFileUpload"), function (success) {
+                console.log(JSON.stringify(success));
+                $ionicLoading.hide();   //hide Loading
+
+                var obj = eval("("+success.response+")");
+                if(obj.error != "0") {
+                    $cordovaToast.showShortBottom(obj.message);
+                }else {
+                    if(obj.file_info) $scope.addTimeline(obj.file_info);
+                    // var random = (new Date()).toString();
+                    // $localStorage.member_info.profile_image.src = $rootScope.member_info.profile_image.src + "?cb=" + random;
+                    // $rootScope.member_info = $localStorage.member_info;
+                }
+            }, function (error) {
+                $ionicLoading.hide();
+                console.log(error);
+                $cordovaToast.showShortBottom("파일 업로드를 실패하였습니다.");
+            }, options);
         };
 
         $scope.saveSequence = function(){

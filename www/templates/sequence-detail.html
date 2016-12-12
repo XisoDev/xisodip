@@ -4,13 +4,13 @@
         <button class="button button-clear" ng-click="showMainImg()">대표이미지</button>
     </ion-nav-buttons>
 
-    <div class="cover_image" style="background-image:url('{{sequence.main_img.thumb_filename | makeImgSrc}}');" ng-click="showSeqEdit()"></div>
+    <div class="cover_image" style="background-image:url('{{sequence.main_img.thumb_filename || '/files/no_image.png' | makeImgSrc}}');" ng-click="showSeqEdit()"></div>
     <ion-content class="padding">
         <div class="padding has_cover">
             <h5>포함된 텍스트 클립 <i class="ion-edit" ng-click="showSeqEdit()" style="color:#999;"></i></h5>
             <p ng-bind-html="sequence.text_clip | nl2br"></p>
             <br />
-            <h5> 타임라인 - {{sequence.total_time | toTime}}
+            <h5> 타임라인 - {{sequence.timeline | realTime | toTime}}
                 <a ng-show="!shouldShowReorder" ng-click="shouldShowReorder = !shouldShowReorder" style="float:right;">순서 편집</a>
                 <a ng-show="shouldShowReorder" ng-click="shouldShowReorder = !shouldShowReorder" style="float:right;">완료</a>
             </h5>
