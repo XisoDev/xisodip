@@ -1,0 +1,13 @@
+<ion-view cache-view="false">
+    <ion-nav-title>서버 설정</ion-nav-title>
+
+    <ion-content class="padding">
+        <ion-list>
+            <ion-item class="item-input item-stacked-label">
+                <span class="input-label">데이터 서버 URL</span>
+                <input type="text" placeholder="데이터 서버 URL 또는 아이피 주소 입력" ng-model="params.url" />
+            </ion-item>
+        </ion-list>
+        <button class="button button-block button-calm" ng-click="serverInfo.connect(params.url)">저장</button>
+    </ion-content>
+</ion-view>

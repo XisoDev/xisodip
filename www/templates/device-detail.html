@@ -14,15 +14,15 @@
         <div ng-show="active_tab == 'device'">
             <p class="help-block"><b>디바이스 종류</b></p>
             <div class="whiteBox padding">
-              {{device.name}}
+              {{device.model}}
             </div>
             <div class="whiteBox padding" style="border-top:none;">
               <p class="help-block" ng-bind-html="device.desc | nl2br"></p>
             </div>
             <br />
 
-            <p class="help-block"><b>Object ID</b></p>
-            <div class="whiteBox padding">{{device.obj_id}}</div>
+            <p class="help-block"><b>UUID</b></p>
+            <div class="whiteBox padding">{{device.uuid}}</div>
             <br />
 
             <!--<p class="help-block"><b>상태</b></p>

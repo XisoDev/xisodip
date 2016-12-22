@@ -1,103 +1,182 @@
-var mime_list = {
-    "bmp": "image/bmp",
-    "cgm": "image/cgm",
-    "g3": "image/g3fax",
-    "gif": "image/gif",
-    "ief": "image/ief",
-    "jp2": "image/jp2",
-    "jpeg": "image/jpeg",
-    "jpg": "image/jpeg",
-    "jpe": "image/jpeg",
-    "pict": "image/pict",
-    "pic": "image/pict",
-    "png": "image/png",
-    "btif": "image/prs.btif",
-    "svg": "image/svg+xml",
-    "svgz": "image/svg+xml",
-    "tiff": "image/tiff",
-    "tif": "image/tiff",
-    "psd": "image/vnd.adobe.photoshop",
-    "djvu": "image/vnd.djvu",
-    "djv": "image/vnd.djvu",
-    "dwg": "image/vnd.dwg",
-    "dxf": "image/vnd.dxf",
-    "fbs": "image/vnd.fastbidsheet",
-    "fpx": "image/vnd.fpx",
-    "fst": "image/vnd.fst",
-    "mmr": "image/vnd.fujixerox.edmics-mmr",
-    "rlc": "image/vnd.fujixerox.edmics-rlc",
-    "mdi": "image/vnd.ms-modi",
-    "npx": "image/vnd.net-fpx",
-    "wbmp": "image/vnd.wap.wbmp",
-    "xif": "image/vnd.xiff",
-    "ras": "image/x-cmu-raster",
-    "cmx": "image/x-cmx",
-    "fh": "image/x-freehand",
-    "fhc": "image/x-freehand",
-    "fh4": "image/x-freehand",
-    "fh5": "image/x-freehand",
-    "fh7": "image/x-freehand",
-    "ico": "image/x-icon",
-    "pntg": "image/x-macpaint",
-    "pnt": "image/x-macpaint",
-    "mac": "image/x-macpaint",
-    "pcx": "image/x-pcx",
-    "pct": "image/x-pict",
-    "pnm": "image/x-portable-anymap",
-    "pbm": "image/x-portable-bitmap",
-    "pgm": "image/x-portable-graymap",
-    "ppm": "image/x-portable-pixmap",
-    "qtif": "image/x-quicktime",
-    "qti": "image/x-quicktime",
-    "rgb": "image/x-rgb",
-    "xbm": "image/x-xbitmap",
-    "xpm": "image/x-xpixmap",
-    "xwd": "image/x-xwindowdump",
-    "3gp": "video/3gpp",
-    "3g2": "video/3gpp2",
-    "h261": "video/h261",
-    "h263": "video/h263",
-    "h264": "video/h264",
-    "jpgv": "video/jpeg",
-    "jpm": "video/jpm",
-    "jpgm": "video/jpm",
-    "mj2": "video/mj2",
-    "mjp2": "video/mj2",
-    "mp4": "video/mp4",
-    "mp4v": "video/mp4",
-    "mpg4": "video/mp4",
-    "m4v": "video/mp4",
-    "webm": "video/webm",
-    "mpeg": "video/mpeg",
-    "mpg": "video/mpeg",
-    "mpe": "video/mpeg",
-    "m1v": "video/mpeg",
-    "m2v": "video/mpeg",
-    "ogv": "video/ogg",
-    "qt": "video/quicktime",
-    "mov": "video/quicktime",
-    "fvt": "video/vnd.fvt",
-    "mxu": "video/vnd.mpegurl",
-    "m4u": "video/vnd.mpegurl",
-    "pyv": "video/vnd.ms-playready.media.pyv",
-    "viv": "video/vnd.vivo",
-    "dv": "video/x-dv",
-    "dif": "video/x-dv",
-    "f4v": "video/x-f4v",
-    "fli": "video/x-fli",
-    "flv": "video/x-flv",
-    "asf": "video/x-ms-asf",
-    "asx": "video/x-ms-asf",
-    "wm": "video/x-ms-wm",
-    "wmv": "video/x-ms-wmv",
-    "wmx": "video/x-ms-wmx",
-    "wvx": "video/x-ms-wvx",
-    "avi": "video/x-msvideo",
-    "movie": "video/x-sgi-movie"
-};
-
+/**
+ * String to Number
+ * overcode@xiso.co.kr
+ */
 function onum(str){
     var result = Number(str);
     if(isNaN(result)) result = 0;
+
     return result;
+}
+
+/**
+ * url 앞에 http:// 를 붙여줌. url 마지막에 / 를 붙여줌.
+ * overcode@xiso.co.kr
+ */
+function getFullUrl(url) {
+    var fullUrl = url;
+    // var fullUrl = url.replace(cs/g, "");
+
+    fullUrl = fullUrl.toLowerCase();
+
+    // console.log("fullUrl.indexOf('https://') = " + fullUrl.indexOf('https://'));
+
+    if(fullUrl.indexOf('http://') != 0 && fullUrl.indexOf('https://') != 0){
+        fullUrl = 'http://' + fullUrl;
+    }
+
+    if(fullUrl.lastIndexOf('/' != (fullUrl.length - 1))){
+        fullUrl = fullUrl + '/';
+    }
+
+    return fullUrl;
+}
+
+function checkUrlPattern(strUrl) {
+    var expUrl = /^(https?\:\/\/)?((\w+)[.])+(asia|biz|cc|cn|com|de|eu|in|info|jobs|jp|kr|mobi|mx|name|net|nz|org|travel|tv|tw|uk|us)(\/(\w*))*$/i;
+    return expUrl.test(strUrl);
+}
+
+function checkIpPattern(strIP) {
+    // var expUrl = /^(http\:\/\/)?(1|2)?\d?\d([.](1|2)?\d?\d){3}$/;
+    var expUrl = /^(https?\:\/\/)?(1|2)?\d?\d([.](1|2)?\d?\d){3}(\/(\w*))*$/i;
+    return expUrl.test(strIP);
+}
+
+/**
+ *  Secure Hash Algorithm (SHA1)
+ *  http://www.webtoolkit.info/
+ **/
+function sha1(msg) {
+    function rotate_left(n,s) {
+        var t4 = ( n<<s ) | (n>>>(32-s));
+        return t4;
+    };
+    function lsb_hex(val) {
+        var str="";
+        var i;
+        var vh;
+        var vl;
+        for( i=0; i<=6; i+=2 ) {
+            vh = (val>>>(i*4+4))&0x0f;
+            vl = (val>>>(i*4))&0x0f;
+            str += vh.toString(16) + vl.toString(16);
+        }
+        return str;
+    };
+    function cvt_hex(val) {
+        var str="";
+        var i;
+        var v;
+        for( i=7; i>=0; i-- ) {
+            v = (val>>>(i*4))&0x0f;
+            str += v.toString(16);
+        }
+        return str;
+    };
+    function Utf8Encode(string) {
+        string = string.replace(/\r\n/g,"\n");
+        var utftext = "";
+        for (var n = 0; n < string.length; n++) {
+            var c = string.charCodeAt(n);
+            if (c < 128) {
+                utftext += String.fromCharCode(c);
+            }
+            else if((c > 127) && (c < 2048)) {
+                utftext += String.fromCharCode((c >> 6) | 192);
+                utftext += String.fromCharCode((c & 63) | 128);
+            }
+            else {
+                utftext += String.fromCharCode((c >> 12) | 224);
+                utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+                utftext += String.fromCharCode((c & 63) | 128);
+            }
+        }
+        return utftext;
+    };
+    var blockstart;
+    var i, j;
+    var W = new Array(80);
+    var H0 = 0x67452301;
+    var H1 = 0xEFCDAB89;
+    var H2 = 0x98BADCFE;
+    var H3 = 0x10325476;
+    var H4 = 0xC3D2E1F0;
+    var A, B, C, D, E;
+    var temp;
+    msg = Utf8Encode(msg);
+    var msg_len = msg.length;
+    var word_array = new Array();
+    for( i=0; i<msg_len-3; i+=4 ) {
+        j = msg.charCodeAt(i)<<24 | msg.charCodeAt(i+1)<<16 |
+            msg.charCodeAt(i+2)<<8 | msg.charCodeAt(i+3);
+        word_array.push( j );
+    }
+    switch( msg_len % 4 ) {
+        case 0:
+            i = 0x080000000;
+            break;
+        case 1:
+            i = msg.charCodeAt(msg_len-1)<<24 | 0x0800000;
+            break;
+        case 2:
+            i = msg.charCodeAt(msg_len-2)<<24 | msg.charCodeAt(msg_len-1)<<16 | 0x08000;
+            break;
+        case 3:
+            i = msg.charCodeAt(msg_len-3)<<24 | msg.charCodeAt(msg_len-2)<<16 | msg.charCodeAt(msg_len-1)<<8  | 0x80;
+            break;
+    }
+    word_array.push( i );
+    while( (word_array.length % 16) != 14 ) word_array.push( 0 );
+    word_array.push( msg_len>>>29 );
+    word_array.push( (msg_len<<3)&0x0ffffffff );
+    for ( blockstart=0; blockstart<word_array.length; blockstart+=16 ) {
+        for( i=0; i<16; i++ ) W[i] = word_array[blockstart+i];
+        for( i=16; i<=79; i++ ) W[i] = rotate_left(W[i-3] ^ W[i-8] ^ W[i-14] ^ W[i-16], 1);
+        A = H0;
+        B = H1;
+        C = H2;
+        D = H3;
+        E = H4;
+        for( i= 0; i<=19; i++ ) {
+            temp = (rotate_left(A,5) + ((B&C) | (~B&D)) + E + W[i] + 0x5A827999) & 0x0ffffffff;
+            E = D;
+            D = C;
+            C = rotate_left(B,30);
+            B = A;
+            A = temp;
+        }
+        for( i=20; i<=39; i++ ) {
+            temp = (rotate_left(A,5) + (B ^ C ^ D) + E + W[i] + 0x6ED9EBA1) & 0x0ffffffff;
+            E = D;
+            D = C;
+            C = rotate_left(B,30);
+            B = A;
+            A = temp;
+        }
+        for( i=40; i<=59; i++ ) {
+            temp = (rotate_left(A,5) + ((B&C) | (B&D) | (C&D)) + E + W[i] + 0x8F1BBCDC) & 0x0ffffffff;
+            E = D;
+            D = C;
+            C = rotate_left(B,30);
+            B = A;
+            A = temp;
+        }
+        for( i=60; i<=79; i++ ) {
+            temp = (rotate_left(A,5) + (B ^ C ^ D) + E + W[i] + 0xCA62C1D6) & 0x0ffffffff;
+            E = D;
+            D = C;
+            C = rotate_left(B,30);
+            B = A;
+            A = temp;
+        }
+        H0 = (H0 + A) & 0x0ffffffff;
+        H1 = (H1 + B) & 0x0ffffffff;
+        H2 = (H2 + C) & 0x0ffffffff;
+        H3 = (H3 + D) & 0x0ffffffff;
+        H4 = (H4 + E) & 0x0ffffffff;
+    }
+    var temp = cvt_hex(H0) + cvt_hex(H1) + cvt_hex(H2) + cvt_hex(H3) + cvt_hex(H4);
+
+    return temp.toLowerCase();
 }

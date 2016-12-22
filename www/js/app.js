@@ -7,7 +7,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('xisodip', ['ionic', 'ngCordova', 'xisodip.controllers', 'xisodip.services'])
 
-    .run(function($ionicPlatform) {
+    .run(function($ionicPlatform, Auth) {
         $ionicPlatform.ready(function() {
             // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
             // for form inputs)
@@ -20,12 +20,9 @@ angular.module('xisodip', ['ionic', 'ngCordova', 'xisodip.controllers', 'xisodip
                 // org.apache.cordova.statusbar required
                 StatusBar.styleDefault();
             }
-        });
-    })
 
-    .constant('xisoConfig', {
-        url: '/api'
-        // url: 'http://xisodip.xiso.co.kr'
+            Auth.setDeviceInfo(ionic.Platform.device());
+        });
     })
 
     .filter('nl2br', ['$sce', function ($sce) {
@@ -71,16 +68,22 @@ angular.module('xisodip', ['ionic', 'ngCordova', 'xisodip.controllers', 'xisodip
         };
     })
 
-    .filter('makeImgSrc', function(xisoConfig){
+    .filter('makeImgSrc', function(ServerInfo){
         return function(url) {
             // console.log(url);
             if(typeof(url) === 'undefined') return '';
 
             if(url.indexOf('./files') == 0) url = url.substr(1);
 
-            return xisoConfig.url + url;
+            return ServerInfo.url + url;
         }
     })
+
+    .config(['$ionicConfigProvider', function($ionicConfigProvider) {
+
+        $ionicConfigProvider.tabs.position('bottom'); // other values: top
+
+    }])
 
     .config(function($stateProvider, $urlRouterProvider) {
 
@@ -90,10 +93,21 @@ angular.module('xisodip', ['ionic', 'ngCordova', 'xisodip.controllers', 'xisodip
         // Each state's controller can be found in controllers.js
         $stateProvider
 
+            .state('serverSet', {
+                url: '/serverSet',
+                templateUrl: 'templates/server-set.html',
+                controller: 'serverSetCtrl'
+            })
+
             .state('login', {
                 url: '/login',
                 templateUrl: 'templates/login.html',
-                controller: 'loginCtrl'
+                controller: 'loginCtrl',
+                onEnter: function($state, ServerInfo){
+                    if(!ServerInfo.isExist()){
+                        $state.go('serverSet');
+                    }
+                }
             })
 
             // setup an abstract state for the tabs directive
@@ -161,6 +175,16 @@ angular.module('xisodip', ['ionic', 'ngCordova', 'xisodip.controllers', 'xisodip
                     'dip-config': {
                         templateUrl: 'templates/dip-config.html',
                         controller: 'configCtrl'
+                    }
+                }
+            })
+
+            .state('dip.config-server', {
+                url: '/configServer',
+                views: {
+                    'dip-config': {
+                        templateUrl: 'templates/dip-config-server.html',
+                        controller: 'configServerCtrl'
                     }
                 }
             });

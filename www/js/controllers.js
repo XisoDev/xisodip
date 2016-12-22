@@ -1,6 +1,17 @@
 angular.module('xisodip.controllers', [])
 
-    .controller('loginCtrl', function($scope, Auth, $cordovaToast, xiHttp) {
+    .controller('serverSetCtrl', function($scope, ServerInfo) {
+        $scope.params = {};
+
+        $scope.serverInfo = ServerInfo;
+
+        // $scope.connect = function(){
+        //     console.log($scope.params);return;
+        //     // $scope.serverInfo.connect($scope.params.url);
+        // };
+    })
+
+    .controller('loginCtrl', function($scope, Auth) {
         $scope.params = {};
 
         var session = window.localStorage['session'];
@@ -37,10 +48,12 @@ angular.module('xisodip.controllers', [])
         };
     })
 
-    .controller('deviceCtrl', function($scope, Player, $ionicModal) {
+    .controller('deviceCtrl', function($scope, $ionicModal, Player, mHttp, xiHttp, ServerInfo, Toast, Auth) {
         // $scope.$on('$ionicView.enter', function(e) {
         //     $scope.init();
         // });
+        
+        $scope.params = {};
 
         $scope.init = function(){
             Player.all().then(function(res){
@@ -54,6 +67,34 @@ angular.module('xisodip.controllers', [])
 
         $scope.remove = function(device) {
             // Player.remove(device);
+        };
+        
+        $scope.savePlayer = function() {
+
+            $scope.params.device_info = Auth.getDeviceInfo();
+
+            // 메인서버에 parent_uuid 를 삽입.
+            mHttp.send('player', 'procUpdatePlayer', $scope.params).then(function(res){
+                if(res.data.error == 0){
+                    console.log(res.data.message);
+
+                    // 데이터서버에 단말기 정보를 저장
+                    xiHttp.send('player','procAddPlayer', $scope.params).then(function(res2){
+                        if(res2.data.error == 0){
+                            console.log(res2);
+                            Toast(res2.data.message);
+                            $scope.params = {};
+                            $scope.closeAddDevice();
+                            $scope.init();
+                        }else{
+                            Toast(res2.data.message);
+                        }
+                    }, function(res2){ console.log(res2); });
+
+                }else{
+                    Toast(res.data.message);
+                }
+            },function(res){ console.log(res); });
         };
 
         $ionicModal.fromTemplateUrl('device-add.html', {
@@ -75,7 +116,7 @@ angular.module('xisodip.controllers', [])
 
     })
 
-    .controller('deviceDetailCtrl', function($scope, $stateParams, $state, Player, Seq, $ionicModal, $cordovaToast) {
+    .controller('deviceDetailCtrl', function($scope, $stateParams, $state, Player, Seq, $ionicModal, Toast) {
         $scope.$on('$stateChangeSuccess', function(){
             // $scope.loadMore();
             $scope.sequences = [];
@@ -146,8 +187,8 @@ angular.module('xisodip.controllers', [])
         $scope.changeSequence = function(seq) {
             Player.updateSeq($scope.device.player_srl, seq.seq_srl).then(function(res){
                 if(res.data.message){
-                    $cordovaToast.showShortBottom(res.data.message);
-                    $scope.sequence_change.hide();
+                    Toast(res.data.message);
+                    $scope.closeMdSeqChg();
                     $scope.init();
                 }
             });
@@ -166,7 +207,8 @@ angular.module('xisodip.controllers', [])
     })
 
 
-    .controller('sequenceCtrl', function($scope, $ionicModal, $stateParams, Seq, $state) {
+    .controller('sequenceCtrl', function($scope, $ionicModal, $stateParams, Seq, $state, ServerInfo, Toast) {
+
         $scope.$on('$stateChangeSuccess', function(){
             if($stateParams.isNew) {
                 $scope.showAddSequence();
@@ -190,8 +232,8 @@ angular.module('xisodip.controllers', [])
         };
 
         $scope.addSeq = function(){
-            if(!$scope.params.title) $cordovaToast.showShortBottom('시퀀스 제목을 입력하세요');
-            if(!$scope.params.text_clip) $cordovaToast.showShortBottom('텍스트 클립을 입력하세요');
+            if(!$scope.params.title) Toast('시퀀스 제목을 입력하세요');
+            if(!$scope.params.text_clip) Toast('텍스트 클립을 입력하세요');
 
             // $scope.sequences.push(angular.copy($scope.params));
             var params = angular.copy($scope.params);
@@ -221,7 +263,7 @@ angular.module('xisodip.controllers', [])
         $scope.init();
     })
 
-    .controller('sequenceDetailCtrl', function($scope, $stateParams, $state, Seq, $ionicActionSheet, $timeout, Transition, xiHttp, $ionicModal, File, $cordovaCamera, $ionicPlatform, $ionicLoading, xisoConfig) {
+    .controller('sequenceDetailCtrl', function($scope, $stateParams, $state, Seq, $ionicActionSheet, $timeout, Transition, xiHttp, $ionicModal, File, $cordovaCamera, $ionicPlatform, $ionicLoading, Mime, ServerInfo, Toast) {
 
         $scope.$on('$stateChangeSuccess', function(){
             if($stateParams.params.title || $stateParams.params.text_clip) {
@@ -374,9 +416,9 @@ angular.module('xisodip.controllers', [])
             var fileURL = $scope.cameraimage;
             var fileName = fileURL.substr(fileURL.lastIndexOf('/') + 1);
             var ext = fileURL.substr(fileURL.lastIndexOf('.') + 1);
-            var mimeType = mime_list[ext.toLowerCase()];
-            console.log('fileName = ' + fileName);
-            console.log('mimetype = ' + mimeType);
+            var mimeType = Mime(ext.toLowerCase());
+            // console.log('fileName = ' + fileName);
+            // console.log('mimetype = ' + mimeType);
 
             var options = new FileUploadOptions();
             options.fileKey = "file";
@@ -388,13 +430,13 @@ angular.module('xisodip.controllers', [])
             params.title = options.fileName;
             options.params = params;
             var ft = new FileTransfer();
-            ft.upload(fileURL, encodeURI("http://172.30.1.4:8100" + xisoConfig.url + "/proc.php?module=file&act=procFileUpload"), function (success) {
+            ft.upload(fileURL, encodeURI("http://172.30.1.4:8100" + ServerInfo.url + "/proc.php?module=file&act=procFileUpload"), function (success) {
                 console.log(JSON.stringify(success));
                 $ionicLoading.hide();   //hide Loading
 
                 var obj = eval("("+success.response+")");
                 if(obj.error != "0") {
-                    $cordovaToast.showShortBottom(obj.message);
+                    Toast(obj.message);
                 }else {
                     if(obj.file_info) $scope.addTimeline(obj.file_info);
                     // var random = (new Date()).toString();
@@ -404,7 +446,7 @@ angular.module('xisodip.controllers', [])
             }, function (error) {
                 $ionicLoading.hide();
                 console.log(error);
-                $cordovaToast.showShortBottom("파일 업로드를 실패하였습니다.");
+                Toast("파일 업로드를 실패하였습니다.");
             }, options);
         };
 
@@ -476,13 +518,25 @@ angular.module('xisodip.controllers', [])
 
     })
 
-    .controller('configCtrl', function($scope, $state, Auth) {
-        $scope.settings = {
-            enableFriends: true
+    .controller('configCtrl', function($scope, $state, Auth, Toast, ServerInfo) {
+
+        $scope.goServer = function() {
+            $state.go('dip.config-server');
         };
 
         $scope.logout = function() {
             Auth.logout();
+
+            Toast('로그아웃 되었습니다.');
+
             $state.go('login');
         };
+        
+    })
+
+    .controller('configServerCtrl', function($scope, ServerInfo) {
+        $scope.params = {};
+
+        $scope.serverInfo = ServerInfo;
+
     });

@@ -35,17 +35,17 @@
           </div>
           <div class="list">
             <label class="item item-input">
-              <input type="number" placeholder="단말인증코드">
+              <input type="text" placeholder="단말기 명" ng-model="params.title">
             </label>
             <label class="item item-input">
-              <input type="password" placeholder="비밀번호">
+              <input type="number" placeholder="인증코드" ng-model="params.auth_no">
             </label>
             <label class="item item-input">
-              <textarea placeholder="단말기 설명" rows="3"></textarea>
+              <textarea placeholder="단말기 설명" rows="3" ng-model="params.desc"></textarea>
             </label>
           </div>
           <div class="padding">
-            <button class="button button-block button-positive button-small">
+            <button class="button button-block button-positive button-small" ng-click="savePlayer()">
               단말기 등록
             </button>
           </div>
