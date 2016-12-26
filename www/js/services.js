@@ -29,8 +29,8 @@ angular.module('xisodip.services', [])
     .factory('mHttp', function($http){
         var self = this;
 
-        var baseUrl = '/api2/';     // 프록시
-        // var baseUrl = 'http://dip.xiso.co.kr/';     // main server URL
+        // var baseUrl = '/api2/';     // 프록시
+        var baseUrl = 'http://dip.xiso.co.kr/';     // main server URL
         var _finalUrl = '';
 
         self.send = function(module, act, params){
@@ -185,7 +185,7 @@ angular.module('xisodip.services', [])
                     Toast('접속을 성공하였습니다.');
 
                     self.url = url;
-                    self.url = '/api/'; // 프록시 서버 사용시 주석 해제
+                    // self.url = '/api/'; // 프록시 서버 사용시 주석 해제
 
                     window.localStorage['serverUrl'] = JSON.stringify(self.url);
 

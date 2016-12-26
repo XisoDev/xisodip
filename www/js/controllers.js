@@ -153,10 +153,8 @@ angular.module('xisodip.controllers', [])
         $scope.moreDataCanBeLoaded = true;
         $scope.search = {};
 
-        $scope.init = function() {
-
+        if($stateParams.deviceSrl) {
             Player.get($stateParams.deviceSrl).then(function (res) {
-                // console.log(res);
                 $scope.device = res.data;
                 if (res.data.seq_srl) {
                     Seq.get(res.data.seq_srl).then(function (res2) {
@@ -228,8 +226,6 @@ angular.module('xisodip.controllers', [])
                 $state.go('dip.sequence-edit', {params: params});
             }
         };
-
-        $scope.init();
     })
 
 
@@ -300,18 +296,17 @@ angular.module('xisodip.controllers', [])
     })
 
     .controller('sequenceDetailCtrl', function($scope, $stateParams, $state, Seq, $ionicActionSheet, $timeout, Transition, xiHttp, $ionicModal, File, $cordovaCamera, $ionicPlatform, $ionicLoading, Mime, ServerInfo, Toast) {
-
-        $scope.$on('$stateChangeSuccess', function(){
-            if($stateParams.params.title || $stateParams.params.text_clip) {
-                console.log(JSON.stringify($stateParams.params));
-                $scope.sequence = $stateParams.params;
-                $scope.sequence.timeline = [];
-            }
-
+        $scope.$on('$ionicView.enter', function(e) {
+            console.log('enter');
             if($stateParams.params.seq_srl) {
                 Seq.get($stateParams.params.seq_srl).then(function (res) {
                     $scope.sequence = res.data;
                 });
+            }else {
+                if ($stateParams.params.title || $stateParams.params.text_clip) {
+                    $scope.sequence = $stateParams.params;
+                    $scope.sequence.timeline = [];
+                }
             }
 
             $scope.clips = [];
@@ -478,10 +473,11 @@ angular.module('xisodip.controllers', [])
         $scope.UploadDoc = function () {
             var fileURL = $scope.cameraimage;
             var fileName = fileURL.substr(fileURL.lastIndexOf('/') + 1);
+            if(fileName.lastIndexOf('?') != -1) fileName = fileName.substr(0, fileName.lastIndexOf('?'));
             var ext = fileURL.substr(fileURL.lastIndexOf('.') + 1);
             var mimeType = Mime(ext.toLowerCase());
-            // console.log('fileName = ' + fileName);
-            // console.log('mimetype = ' + mimeType);
+            console.log('fileName = ' + fileName);
+            console.log('mimetype = ' + mimeType);
 
             var options = new FileUploadOptions();
             options.fileKey = "file";
@@ -493,7 +489,7 @@ angular.module('xisodip.controllers', [])
             params.title = options.fileName;
             options.params = params;
             var ft = new FileTransfer();
-            ft.upload(fileURL, encodeURI("http://172.30.1.4:8100" + ServerInfo.url + "/proc.php?module=file&act=procFileUpload"), function (success) {
+            ft.upload(fileURL, encodeURI(ServerInfo.url + "proc.php?module=file&act=procFileUpload"), function (success) {
                 console.log(JSON.stringify(success));
                 $ionicLoading.hide();   //hide Loading
 
@@ -517,6 +513,7 @@ angular.module('xisodip.controllers', [])
             // console.log($scope.sequence);
             xiHttp.send('seq','addSeq',$scope.sequence).then(function(res){
                 console.log(res);
+                if(res.data.message) Toast(res.data.message);
             },function(res){ console.log(res); });
         };
 
