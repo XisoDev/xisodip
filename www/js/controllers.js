@@ -12,6 +12,10 @@ angular.module('xisodip.controllers', [])
     })
 
     .controller('loginCtrl', function($scope, Auth) {
+        $scope.$on('$ionicView.enter', function(e) {
+            Auth.logout();
+        });
+
         $scope.params = {};
 
         var session = window.localStorage['session'];
@@ -49,16 +53,31 @@ angular.module('xisodip.controllers', [])
     })
 
     .controller('deviceCtrl', function($scope, $ionicModal, Player, mHttp, xiHttp, ServerInfo, Toast, Auth) {
-        // $scope.$on('$ionicView.enter', function(e) {
-        //     $scope.init();
-        // });
-        
+        $scope.$on('$stateChangeSuccess', function(){
+            $scope.devices = [];
+            $scope.page = 1;
+            $scope.moreDataCanBeLoaded = false;
+            $scope.init();
+        });
         $scope.params = {};
+        $scope.devices = [];
+        $scope.page = 1;
+        $scope.moreDataCanBeLoaded = true;
 
         $scope.init = function(){
-            Player.all().then(function(res){
-                // console.log(res.data);
-                $scope.devices = res.data.list;
+            Player.all($scope.page).then(function(res){
+                for(var key in res.data.list) {
+                    $scope.devices.push(res.data.list[key]);    // 기존 배열에 추가
+                }
+
+                if(res.data.list) {
+                    $scope.page++;
+                }else{
+                    if($scope.page > 1) $scope.page--;
+                    $scope.moreDataCanBeLoaded = false;
+                }
+
+                $scope.$broadcast('scroll.infiniteScrollComplete');
             },function(res){
                 console.log(res);
             });
@@ -67,6 +86,11 @@ angular.module('xisodip.controllers', [])
 
         $scope.remove = function(device) {
             // Player.remove(device);
+        };
+
+        $scope.loadMore = function() {  // 최초 한번 자동 실행됨
+            console.log('load more');
+            $scope.init();
         };
         
         $scope.savePlayer = function() {
@@ -111,8 +135,6 @@ angular.module('xisodip.controllers', [])
         $scope.closeAddDevice = function() {
             $scope.mdDeviceAdd.hide();
         };
-
-        $scope.init();
 
     })
 
@@ -196,11 +218,15 @@ angular.module('xisodip.controllers', [])
 
         $scope.goSequence = function(){
             // #/dip/sequence/{{sequence.seq_srl}}
-            if($scope.sequence) $state.go('dip.sequence-edit', {sequenceSrl : $scope.sequence.seq_srl});
-        };
+            if($scope.sequence) {
+                var params = {
+                    seq_srl : $scope.sequence.seq_srl,
+                    title : $scope.sequence.title,
+                    text_clip : $scope.sequence.text_clip
 
-        $scope.goNewSequence = function(){
-            $state.go('dip.sequence', {isNew : true});
+                };
+                $state.go('dip.sequence-edit', {params: params});
+            }
         };
 
         $scope.init();
@@ -208,23 +234,35 @@ angular.module('xisodip.controllers', [])
 
 
     .controller('sequenceCtrl', function($scope, $ionicModal, $stateParams, Seq, $state, ServerInfo, Toast) {
-
-        $scope.$on('$stateChangeSuccess', function(){
-            if($stateParams.isNew) {
-                $scope.showAddSequence();
-            }
-        });
-
         $scope.params = {};
 
+        $scope.sequences = [];
+        $scope.page = 1;
+        $scope.moreDataCanBeLoaded = true;
+
         $scope.init = function(){
-            Seq.all().then(function(res){
+            Seq.all($scope.page).then(function(res){
                 // console.log(res.data);
-                $scope.sequences = res.data.list;
+                for(var key in res.data.list) {
+                    $scope.sequences.push(res.data.list[key]);    // 기존 배열에 추가
+                }
+
+                if(res.data.list) {
+                    $scope.page++;
+                }else{
+                    if($scope.page > 1) $scope.page--;
+                    $scope.moreDataCanBeLoaded = false;
+                }
+
+                $scope.$broadcast('scroll.infiniteScrollComplete');
             },function(res){
                 console.log(res);
             });
 
+        };
+
+        $scope.loadMore = function(){
+            $scope.init();
         };
 
         $scope.goEdit = function(seq_srl){
@@ -259,14 +297,13 @@ angular.module('xisodip.controllers', [])
         $scope.closeAddSequence = function() {
             $scope.mdSequenceAdd.hide();
         };
-
-        $scope.init();
     })
 
     .controller('sequenceDetailCtrl', function($scope, $stateParams, $state, Seq, $ionicActionSheet, $timeout, Transition, xiHttp, $ionicModal, File, $cordovaCamera, $ionicPlatform, $ionicLoading, Mime, ServerInfo, Toast) {
 
         $scope.$on('$stateChangeSuccess', function(){
             if($stateParams.params.title || $stateParams.params.text_clip) {
+                console.log(JSON.stringify($stateParams.params));
                 $scope.sequence = $stateParams.params;
                 $scope.sequence.timeline = [];
             }
@@ -286,6 +323,8 @@ angular.module('xisodip.controllers', [])
 
         $scope.page = 1;
         $scope.clips = [];
+        $scope.sequence = {};
+        $scope.sequence.timeline = [];
         $scope.moreDataCanBeLoaded = true;
         $scope.search = {};
 
@@ -355,6 +394,27 @@ angular.module('xisodip.controllers', [])
 
         $scope.removeTimeline = function(index){
             $scope.sequence.timeline.splice(index, 1);
+
+            var isExistMain = false;
+            $scope.sequence.timeline.forEach(function(val, idx){
+                console.log('main file_srl = '+ $scope.sequence.main_img.file_srl);
+                console.log('timeline file_srl = '+ val.file_srl);
+
+                if($scope.sequence.main_img.file_srl == val.file_srl) {
+                    console.log('대표이미지가 아직 타임라인에 존재합니다');
+                    $scope.sequence.main_img = angular.copy(val);   // 아직 시퀀스가 남아있으면 대표이미지 대체
+                    isExistMain = true;
+                }
+            });
+
+            // 대표이미지가 삭제 되었을때
+            if(!isExistMain) {
+                if($scope.sequence.timeline.length > 0) {
+                    $scope.sequence.main_img = angular.copy($scope.sequence.timeline[0]);
+                }else {
+                    $scope.sequence.main_img = null;
+                }
+            }
         };
 
         $scope.changeMainImg = function(time){
@@ -364,9 +424,12 @@ angular.module('xisodip.controllers', [])
 
         $scope.addTimeline = function(clip){
             var cloneClip = angular.copy(clip);
-            if(!cloneClip.duration) cloneClip.duration = 3;
-            if(!cloneClip.transition) cloneClip.transition = 'slide-up';
+            if(!cloneClip.duration) cloneClip.duration = 3; // 기본 3초
+            if(!cloneClip.transition) cloneClip.transition = 'slide-left';  // 기본 전환효과
             $scope.sequence.timeline.push(cloneClip);
+
+            if(!$scope.sequence.main_img) $scope.sequence.main_img = cloneClip; // 대표 이미지가 없다면 대표 이미지로 지정
+
             $scope.closeClip();
         };
 
@@ -536,7 +599,5 @@ angular.module('xisodip.controllers', [])
 
     .controller('configServerCtrl', function($scope, ServerInfo) {
         $scope.params = {};
-
-        $scope.serverInfo = ServerInfo;
-
+        $scope.params.url = angular.copy(ServerInfo.url);
     });

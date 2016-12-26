@@ -1,19 +1,20 @@
 angular.module('xisodip.services', [])
 
-    .factory('xiHttp', function($http){
-        var service = {};
-        
-        var baseUrl;
-        if(window.localStorage['serverUrl']) baseUrl = JSON.parse(window.localStorage['serverUrl']);
-
+    .factory('xiHttp', function($http, ServerInfo){
+        var self = this;
+        var baseUrl = '';
         var _finalUrl = '';
 
-        service.send = function(module, act, params){
+        self.send = function(module, act, params){
+            baseUrl = ServerInfo.url;
+
             if(act.indexOf('disp') == 0){
                 _finalUrl = baseUrl + 'disp.php?module=' + module + '&act=' + act;
             }else /*if(act.indexOf('proc') == 0)*/{
                 _finalUrl = baseUrl + 'proc.php?module=' + module + '&act=' + act;
             }
+
+            console.log('xiHttp request : ' + _finalUrl);
 
             return $http({
                 method: 'POST',
@@ -22,14 +23,14 @@ angular.module('xisodip.services', [])
             });
         };
 
-        return service;
+        return self;
     })
 
     .factory('mHttp', function($http){
         var self = this;
 
-        // var baseUrl = '/api2/';     // main server URL
-        var baseUrl = 'http://dip.xiso.co.kr/';     // main server URL
+        var baseUrl = '/api2/';     // 프록시
+        // var baseUrl = 'http://dip.xiso.co.kr/';     // main server URL
         var _finalUrl = '';
 
         self.send = function(module, act, params){
@@ -154,7 +155,7 @@ angular.module('xisodip.services', [])
         }
     })
 
-    .factory('ServerInfo', function($http, $state, $ionicHistory, Toast, Auth){
+    .factory('ServerInfo', function($http, $state, $ionicHistory, Toast){
         var self = this;
 
         self.url = '';
@@ -184,15 +185,13 @@ angular.module('xisodip.services', [])
                     Toast('접속을 성공하였습니다.');
 
                     self.url = url;
-                    // self.url = '/api/'; // 실서버 사용시 주석 해제
+                    self.url = '/api/'; // 프록시 서버 사용시 주석 해제
 
                     window.localStorage['serverUrl'] = JSON.stringify(self.url);
 
                     $ionicHistory.nextViewOptions({
                         disableBack: true
                     });
-
-                    Auth.logout();
 
                     $state.go('login');
                 } else {
@@ -228,6 +227,8 @@ angular.module('xisodip.services', [])
         };
 
         var init = function() {
+            if(!window.localStorage['serverUrl']) return ;
+
             // 다바이스정보가 저장되어있지않으면 저장
             if(window.localStorage['device']) {
                 var deviceInfo = JSON.parse(window.localStorage['device']);
@@ -278,6 +279,7 @@ angular.module('xisodip.services', [])
         };
 
         var setDeviceInfo = function(device) {
+            console.log(device);
             if(!window.localStorage['device']) window.localStorage['device'] = JSON.stringify(device);
         };
 
@@ -289,12 +291,13 @@ angular.module('xisodip.services', [])
             xiHttp.send('member', 'procLogin', params)
                 .then(function(res){
                     if(res.data.error == 0) {
+                        console.log(res.data);
                         init();
                     }else {
                         Toast(res.data.message);
                     }
                 }, function(res){
-                    console.log(res);
+                    console.log(JSON.stringify(res));
                 });
         };
 
@@ -328,7 +331,7 @@ angular.module('xisodip.services', [])
         // Might use a resource here that returns a JSON array
 
         // Some fake testing data
-        var transition = ['slide-up','slide-down','slide-left','slide-right','fade-in'];
+        var transition = ['slide-left','slide-right','slide-up','slide-down','fade-in'];
 
         return {
             all: function() {
@@ -339,8 +342,8 @@ angular.module('xisodip.services', [])
 
     .factory('Player', function(xiHttp){
         return {
-            all: function() {
-                return xiHttp.send('player','dispPlayerListAndSeq');
+            all: function(page) {
+                return xiHttp.send('player','dispPlayerListAndSeq',{page: page, list_count: 4});
             },
             get: function(playerSrl) {
                 return xiHttp.send('player','dispPlayer',{player_srl : playerSrl});

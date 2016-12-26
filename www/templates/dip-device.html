@@ -1,4 +1,4 @@
-<ion-view view-title="단말기관리">
+<ion-view view-title="플레이어 관리">
   <ion-nav-buttons side="primary">
       <h1 class="title"></h1>
       <div class="buttons">
@@ -18,6 +18,11 @@
         </ion-option-button>
       </ion-item>
     </ion-list>
+
+    <ion-infinite-scroll
+            ng-if="moreDataCanBeLoaded"
+            on-infinite="loadMore()">
+    </ion-infinite-scroll>
 
 
     <script id="device-add.html" type="text/ng-template">

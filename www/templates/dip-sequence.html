@@ -21,6 +21,11 @@
       </ion-item>
     </ion-list>
 
+    <ion-infinite-scroll
+            ng-if="moreDataCanBeLoaded"
+            on-infinite="loadMore()">
+    </ion-infinite-scroll>
+
 
     <script id="sequence-add.html" type="text/ng-template">
       <ion-modal-view style="background:#eeeeee;">

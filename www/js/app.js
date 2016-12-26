@@ -70,7 +70,6 @@ angular.module('xisodip', ['ionic', 'ngCordova', 'xisodip.controllers', 'xisodip
 
     .filter('makeImgSrc', function(ServerInfo){
         return function(url) {
-            // console.log(url);
             if(typeof(url) === 'undefined') return '';
 
             if(url.indexOf('./files') == 0) url = url.substr(1);
@@ -82,15 +81,11 @@ angular.module('xisodip', ['ionic', 'ngCordova', 'xisodip.controllers', 'xisodip
     .config(['$ionicConfigProvider', function($ionicConfigProvider) {
 
         $ionicConfigProvider.tabs.position('bottom'); // other values: top
+        $ionicConfigProvider.tabs.style('standard');
 
     }])
 
     .config(function($stateProvider, $urlRouterProvider) {
-
-        // Ionic uses AngularUI Router which uses the concept of states
-        // Learn more here: https://github.com/angular-ui/ui-router
-        // Set up the various states which the app can be in.
-        // Each state's controller can be found in controllers.js
         $stateProvider
 
             .state('serverSet', {
