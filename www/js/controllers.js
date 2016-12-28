@@ -101,19 +101,27 @@ angular.module('xisodip.controllers', [])
             mHttp.send('player', 'procUpdatePlayer', $scope.params).then(function(res){
                 if(res.data.error == 0){
                     console.log(res.data.message);
+                    console.log(res.data.player);
 
-                    // 데이터서버에 단말기 정보를 저장
-                    xiHttp.send('player','procAddPlayer', $scope.params).then(function(res2){
-                        if(res2.data.error == 0){
+                    if(res.data.player) {
+                        $scope.params.device_info = res.data.player;
+                        // 데이터서버에 단말기 정보를 저장
+                        xiHttp.send('player', 'procAddPlayer', $scope.params).then(function (res2) {
                             console.log(res2);
-                            Toast(res2.data.message);
-                            $scope.params = {};
-                            $scope.closeAddDevice();
-                            $scope.init();
-                        }else{
-                            Toast(res2.data.message);
-                        }
-                    }, function(res2){ console.log(res2); });
+                            if (res2.data.error == 0) {
+                                Toast(res2.data.message);
+                                $scope.params = {};
+                                $scope.closeAddDevice();
+                                $scope.init();
+                            } else {
+                                Toast(res2.data.message);
+                            }
+                        }, function (res2) {
+                            console.log(res2);
+                        });
+                    }else{
+                        console.log('플레이어 단말기 정보를 가져오지 못했습니다.');
+                    }
 
                 }else{
                     Toast(res.data.message);
@@ -209,7 +217,7 @@ angular.module('xisodip.controllers', [])
                 if(res.data.message){
                     Toast(res.data.message);
                     $scope.closeMdSeqChg();
-                    $scope.init();
+                    $scope.loadMore();
                 }
             });
         };
