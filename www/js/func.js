@@ -37,6 +37,32 @@ function checkUrlPattern(strUrl) {
     return expUrl.test(strUrl);
 }
 
+function ValidUrl(str) {
+
+    var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+
+        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+
+        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+
+        '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+
+    if(!pattern.test(str)) {
+
+        return false;
+
+    } else {
+
+        return true;
+
+    }
+
+}
+
 function checkIpPattern(strIP) {
     // var expUrl = /^(http\:\/\/)?(1|2)?\d?\d([.](1|2)?\d?\d){3}$/;
     var expUrl = /^(https?\:\/\/)?(1|2)?\d?\d([.](1|2)?\d?\d){3}(\/(\w*))*$/i;

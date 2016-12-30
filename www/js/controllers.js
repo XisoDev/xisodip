@@ -4,11 +4,6 @@ angular.module('xisodip.controllers', [])
         $scope.params = {};
 
         $scope.serverInfo = ServerInfo;
-
-        // $scope.connect = function(){
-        //     console.log($scope.params);return;
-        //     // $scope.serverInfo.connect($scope.params.url);
-        // };
     })
 
     .controller('loginCtrl', function($scope, Auth) {
@@ -212,12 +207,13 @@ angular.module('xisodip.controllers', [])
             $scope.mdSequenceChange.hide();
         };
 
+        // 다른 시퀀스로 변경
         $scope.changeSequence = function(seq) {
             Player.updateSeq($scope.device.player_srl, seq.seq_srl).then(function(res){
                 if(res.data.message){
                     Toast(res.data.message);
+                    $scope.sequence = seq;
                     $scope.closeMdSeqChg();
-                    $scope.loadMore();
                 }
             });
         };

@@ -36,6 +36,9 @@
         },
         "cordova-plugin-file-transfer": {
             "PACKAGE_NAME": "com.ionicframework.xisodip849942"
+        },
+        "cordova-plugin-inappbrowser": {
+            "PACKAGE_NAME": "com.ionicframework.xisodip849942"
         }
     },
     "dependent_plugins": {

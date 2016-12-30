@@ -7,7 +7,7 @@
     <div class="cover_image" style="background-image:url('{{sequence.main_img.thumb_filename || '/files/no_image.png' | makeImgSrc}}');" ng-click="showSeqEdit()"></div>
     <ion-content class="padding">
         <div class="padding has_cover">
-            <h5>포함된 텍스트 클립 <i class="ion-edit" ng-click="showSeqEdit()" style="color:#999;"></i></h5>
+            <h5>Notice <i class="ion-edit" ng-click="showSeqEdit()" style="color:#999;"></i></h5>
             <p ng-bind-html="sequence.text_clip | nl2br"></p>
             <br />
             <h5> 타임라인 - {{sequence.timeline | realTime | toTime}}
@@ -60,14 +60,14 @@
             </ion-header-bar>
             <ion-content>
                 <div class="padding">
-                    <p class="help-block">현재 시퀀스의 제목과 텍스트 클립을 수정합니다. 수정 후 저장해야 반영됩니다.</p>
+                    <p class="help-block">현재 시퀀스의 제목과 Notice를 수정합니다. 수정 후 저장해야 반영됩니다.</p>
                 </div>
                 <div class="list">
                     <label class="item item-input">
                         <input type="text" placeholder="시퀀스 제목" ng-model="sequence.title">
                     </label>
                     <label class="item item-input">
-                        <textarea placeholder="텍스트 클립" rows="3" ng-model="sequence.text_clip"></textarea>
+                        <textarea placeholder="Notice" rows="3" ng-model="sequence.text_clip"></textarea>
                     </label>
                 </div>
                 <div class="padding" ng-if="false">

@@ -1,5 +1,9 @@
 <ion-view view-title="로그인" name="login-view">
     <ion-content class="padding">
+        <div style="text-align:center;margin-top:20px;">
+            <img src="img/logo.jpg" width="200px">
+            <h4 style="color:#666;">이미지, 동영상을 통한<br/>가장 쉽고 효과적인 광고</h4>
+        </div>
         <div class="list list-inset">
             <label class="item item-input">
                 <input type="text" placeholder="Username" ng-model="params.user_id">
@@ -9,5 +13,8 @@
             </label>
         </div>
         <button class="button button-block button-calm" ng-click="login()">Login</button>
+        <div style="text-align:center;">
+            <a href="#" style="color:#999;font-size:15px;text-decoration: none;" onclick="window.open('http://softgear.co.kr', '_system');">http://softgear.co.kr</a>
+        </div>
     </ion-content>
 </ion-view>

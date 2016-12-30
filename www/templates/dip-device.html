@@ -23,40 +23,38 @@
             ng-if="moreDataCanBeLoaded"
             on-infinite="loadMore()">
     </ion-infinite-scroll>
-
-
-    <script id="device-add.html" type="text/ng-template">
-      <ion-modal-view style="background:#eeeeee;">
-        <ion-header-bar>
-          <h1 class="title">단말기 추가</h1>
-          <div class="buttons">
-            <button class="button-icon" ng-click="closeAddDevice()"><i class="icon ion-ios-close-empty"></i></button>
-          </div>
-        </ion-header-bar>
-        <ion-content>
-          <div class="padding">
-            <h5>단말기 정보 입력</h5>
-            <p class="help-block">DIP 플레이어앱을 설치하시고, 표시되는 인증코드를 입력해주세요.</p>
-          </div>
-          <div class="list">
-            <label class="item item-input">
-              <input type="text" placeholder="단말기 명" ng-model="params.title">
-            </label>
-            <label class="item item-input">
-              <input type="number" placeholder="인증코드" ng-model="params.auth_no">
-            </label>
-            <label class="item item-input">
-              <textarea placeholder="단말기 설명" rows="3" ng-model="params.desc"></textarea>
-            </label>
-          </div>
-          <div class="padding">
-            <button class="button button-block button-positive button-small" ng-click="savePlayer()">
-              단말기 등록
-            </button>
-          </div>
-        </ion-content>
-      </ion-modal-view>
-    </script>
-
   </ion-content>
+
+  <script id="device-add.html" type="text/ng-template">
+    <ion-modal-view style="background:#eeeeee;">
+      <ion-header-bar>
+        <h1 class="title">플레이어 추가</h1>
+        <div class="buttons">
+          <button class="button-icon" ng-click="closeAddDevice()"><i class="icon ion-ios-close-empty"></i></button>
+        </div>
+      </ion-header-bar>
+      <ion-content>
+        <div class="padding">
+          <h5>플레이어 정보 입력</h5>
+          <p class="help-block">플레이어앱을 설치하시고, 표시되는 인증코드를 입력해주세요.</p>
+        </div>
+        <div class="list">
+          <label class="item item-input">
+            <input type="text" placeholder="단말기 명" ng-model="params.title">
+          </label>
+          <label class="item item-input">
+            <input type="number" placeholder="인증코드" ng-model="params.auth_no">
+          </label>
+          <label class="item item-input">
+            <textarea placeholder="단말기 설명" rows="3" ng-model="params.desc"></textarea>
+          </label>
+        </div>
+        <div class="padding">
+          <button class="button button-block button-positive button-small" ng-click="savePlayer()">
+            플레이어 등록
+          </button>
+        </div>
+      </ion-content>
+    </ion-modal-view>
+  </script>
 </ion-view>

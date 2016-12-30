@@ -2,6 +2,10 @@
     <ion-nav-title>서버 설정</ion-nav-title>
 
     <ion-content class="padding">
+        <div style="text-align:center;margin-top:20px;">
+            <img src="img/logo.jpg" width="200px">
+            <h4 style="color:#666;">이미지, 동영상을 통한<br/>가장 쉽고 효과적인 광고</h4>
+        </div>
         <ion-list>
             <ion-item class="item-input item-stacked-label">
                 <span class="input-label">데이터 서버 URL</span>
@@ -9,5 +13,8 @@
             </ion-item>
         </ion-list>
         <button class="button button-block button-calm" ng-click="serverInfo.connect(params.url)">접속</button>
+        <div style="text-align:center;">
+            <a href="#" style="color:#999;font-size:15px;text-decoration: none;" onclick="window.open('http://softgear.co.kr', '_system');">http://softgear.co.kr</a>
+        </div>
     </ion-content>
 </ion-view>

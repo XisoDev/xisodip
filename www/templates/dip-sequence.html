@@ -25,36 +25,34 @@
             ng-if="moreDataCanBeLoaded"
             on-infinite="loadMore()">
     </ion-infinite-scroll>
-
-
-    <script id="sequence-add.html" type="text/ng-template">
-      <ion-modal-view style="background:#eeeeee;">
-        <ion-header-bar>
-          <h1 class="title">시퀀스 추가</h1>
-          <div class="buttons">
-            <button class="button-icon" ng-click="closeAddSequence()"><i class="icon ion-ios-close-empty"></i></button>
-          </div>
-        </ion-header-bar>
-        <ion-content>
-          <div class="padding">
-            <p class="help-block">새로운 빈 시퀀스를 생성합니다.</p>
-          </div>
-          <div class="list">
-            <label class="item item-input">
-              <input type="text" placeholder="시퀀스 제목" ng-model="params.title">
-            </label>
-            <label class="item item-input">
-              <textarea placeholder="텍스트 클립" ng-model="params.text_clip" rows="3"></textarea>
-            </label>
-          </div>
-          <div class="padding">
-            <button class="button button-block button-positive button-small" ng-click="addSeq()">
-              빈 시퀀스 생성
-            </button>
-          </div>
-        </ion-content>
-      </ion-modal-view>
-    </script>
-
   </ion-content>
+
+  <script id="sequence-add.html" type="text/ng-template">
+    <ion-modal-view style="background:#eeeeee;">
+      <ion-header-bar>
+        <h1 class="title">시퀀스 추가</h1>
+        <div class="buttons">
+          <button class="button-icon" ng-click="closeAddSequence()"><i class="icon ion-ios-close-empty"></i></button>
+        </div>
+      </ion-header-bar>
+      <ion-content>
+        <div class="padding">
+          <p class="help-block">새로운 시퀀스를 생성합니다.</p>
+        </div>
+        <div class="list">
+          <label class="item item-input">
+            <input type="text" placeholder="시퀀스 제목" ng-model="params.title">
+          </label>
+          <label class="item item-input">
+            <textarea placeholder="Notice 입력" ng-model="params.text_clip" rows="3"></textarea>
+          </label>
+        </div>
+        <div class="padding">
+          <button class="button button-block button-positive button-small" ng-click="addSeq()">
+            시퀀스 생성
+          </button>
+        </div>
+      </ion-content>
+    </ion-modal-view>
+  </script>
 </ion-view>

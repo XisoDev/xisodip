@@ -1,5 +1,27 @@
 angular.module('xisodip.services', [])
 
+    .factory('outLink', function ($cordovaInAppBrowser, $ionicPlatform) {
+        return function(url){
+            var options = {
+                location: 'yes',
+                clearcache: 'yes',
+                toolbar: 'no'
+            };
+
+            $cordovaInAppBrowser.open(url, '_blank', options)
+                .then(function(event) {
+                    // success
+                    console.log('$cordovaInAppBrowser - success');
+                })
+                .catch(function(event) {
+                    // error
+                    console.log('$cordovaInAppBrowser - error');
+                });
+
+            $cordovaInAppBrowser.close();
+        }
+    })
+
     .factory('xiHttp', function($http, ServerInfo){
         var self = this;
         var baseUrl = '';
@@ -171,9 +193,10 @@ angular.module('xisodip.services', [])
 
             url = getFullUrl(url);
 
-            console.log('checkUrlPattern = ' + checkUrlPattern(url) + ', checkIpPattern = ' + checkIpPattern(url));
+            // console.log('checkUrlPattern = ' + checkUrlPattern(url) + ', checkIpPattern = ' + checkIpPattern(url));
 
-            if(!checkUrlPattern(url) && !checkIpPattern(url)){
+            // if(!checkUrlPattern(url) && !checkIpPattern(url)){
+            if(!ValidUrl(url)){
                 return Toast('URL 또는 아이피 형식을 올바르게 입력해주세요.');
             }
 
