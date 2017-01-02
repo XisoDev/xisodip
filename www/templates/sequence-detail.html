@@ -120,8 +120,8 @@
                 <ion-list>
                     <ion-item class="item-remove-animate item-thumbnail-left item-icon-right" ng-repeat="clip in clips | filter:search:strict" type="item-text-wrap" ng-click="addTimeline(clip)">
                         <img ng-src="{{clip.thumb_filename | makeImgSrc}}" height="30">
-                        <h2>{{clip.title}}</h2>
-                        <br />
+                        <h2 style="position: relative;">{{clip.title}}<button class="button button-small button-calm" style="position: absolute; right:0;">QR</button></h2>
+                        <br/>
                         <p class="help-block">{{clip.file_type}}</p>
                         <p class="help-block">{{clip.source_filename}}</p>
                     </ion-item>
@@ -166,6 +166,14 @@
                     <label class="item item-input">
                         <span class="input-label">전환효과</span>
                         <select ng-model="selectClip.transition"><option ng-repeat="tran in transitions" value="{{tran}}">{{tran}}</option></select>
+                    </label>
+                    <label class="item item-input">
+                        <span class="input-label">링크</span>
+                        <input type="text" placeholder="http://softgear.co.kr (예)">
+                    </label>
+                    <label class="item item-input">
+                        <span class="input-label">QR코드</span>
+                        <select><option>예</option><option>아니오</option></select>
                     </label>
                 </div>
                 <div class="padding">
