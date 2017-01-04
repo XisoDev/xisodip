@@ -13,11 +13,13 @@ angular.module('xisodip.controllers', [])
 
         $scope.params = {};
 
-        var session = window.localStorage['session'];
+        if(window.localStorage['session']) {
+            var session = JSON.parse(window.localStorage['session']);
 
-        if(session){
-            $scope.params.user_id = session.user_id;
-            $scope.params.password = session.password;
+            if (session) {
+                $scope.params.user_id = session.user_id;
+                $scope.params.password = session.password;
+            }
         }
 
         $scope.login = function(){
@@ -143,9 +145,9 @@ angular.module('xisodip.controllers', [])
 
     .controller('deviceDetailCtrl', function($scope, $stateParams, $state, Player, Seq, $ionicModal, Toast) {
         $scope.$on('$stateChangeSuccess', function(){
-            // $scope.loadMore();
             $scope.sequences = [];
             $scope.page = 1;
+            $scope.$apply();
             $scope.loadMore();
         });
 
@@ -174,6 +176,7 @@ angular.module('xisodip.controllers', [])
         $scope.seqAll = function() {
             Seq.all($scope.page).then(function(res){
                 // console.log(res);
+
                 for(var key in res.data.list) {
                     $scope.sequences.push(res.data.list[key]);    // 기존 배열에 추가
                 }
@@ -233,14 +236,27 @@ angular.module('xisodip.controllers', [])
     })
 
 
-    .controller('sequenceCtrl', function($scope, $ionicModal, $stateParams, Seq, $state, ServerInfo, Toast) {
+    .controller('sequenceCtrl', function($scope, $ionicModal, $stateParams, Seq, $state, ServerInfo, Toast, $ionicPopup, xiHttp) {
         $scope.params = {};
 
         $scope.sequences = [];
         $scope.page = 1;
         $scope.moreDataCanBeLoaded = true;
 
+        $scope.$on('$stateChangeSuccess', function(){
+            $scope.init();
+        });
+
         $scope.init = function(){
+            $scope.sequences = [];
+            $scope.page = 1;
+            $scope.moreDataCanBeLoaded = true;
+            $scope.$apply();
+            $scope.loadMore();
+        };
+
+        $scope.loadMore = function(){
+
             Seq.all($scope.page).then(function(res){
                 // console.log(res.data);
                 for(var key in res.data.list) {
@@ -258,11 +274,6 @@ angular.module('xisodip.controllers', [])
             },function(res){
                 console.log(res);
             });
-
-        };
-
-        $scope.loadMore = function(){
-            $scope.init();
         };
 
         $scope.goEdit = function(seq_srl){
@@ -281,8 +292,33 @@ angular.module('xisodip.controllers', [])
             $state.go('dip.sequence-edit', { params : params});
         };
 
+        var remove_seq = function(sequence){
+            xiHttp.send('seq','deleteSeq',sequence).then(function(res){
+                if(res.data.error == 0){
+                    Toast(res.data.message);
+                    $scope.init();
+                }else{
+                    Toast(res.data.message);
+                }
+            },function(err){
+                console.log(err);
+            });
+        };
+
         $scope.remove = function(sequence) {
-            // sequences.remove(sequence);
+            var confirmPopup = $ionicPopup.confirm({
+                title: '삭제',
+                template: '시퀀스를 삭제하시겠습니까?'
+            });
+
+            confirmPopup.then(function(res) {
+                if(res) {
+                    remove_seq(sequence);
+                    // console.log('You are sure');
+                } else {
+                    // console.log('You are not sure');
+                }
+            });
         };
 
         $ionicModal.fromTemplateUrl('sequence-add.html', {
@@ -299,7 +335,7 @@ angular.module('xisodip.controllers', [])
         };
     })
 
-    .controller('sequenceDetailCtrl', function($scope, $stateParams, $state, Seq, $ionicActionSheet, $timeout, Transition, xiHttp, $ionicModal, File, $cordovaCamera, $ionicPlatform, $ionicLoading, Mime, ServerInfo, Toast) {
+    .controller('sequenceDetailCtrl', function($scope, $stateParams, $state, Seq, $ionicActionSheet,$ionicPopup, $timeout, Transition, xiHttp, $ionicModal, File, $cordovaCamera, $ionicPlatform, $ionicLoading, Mime, ServerInfo, Toast) {
         $scope.$on('$ionicView.enter', function(e) {
             console.log('enter');
             if($stateParams.params.seq_srl) {
@@ -432,12 +468,15 @@ angular.module('xisodip.controllers', [])
             $scope.closeClip();
         };
 
+        $scope.popup = {};
+        $scope.loadingStatus = 0;
+
         $scope.getPhotoLib = function (media_type) {
             // $ionicScrollDelegate.scrollTop();
             $scope.uploadList = false;
             $ionicPlatform.ready(function() {
 
-                var options;
+                var options = {};
 
                 if(media_type=='picture'){
                     options = {
@@ -460,18 +499,26 @@ angular.module('xisodip.controllers', [])
                         mediaType:Camera.MediaType.VIDEO
                     };
                 }
+                // console.log(options);
 
                 $cordovaCamera.getPicture(options).then(function (imageURI) {
-                    $ionicLoading.show({
-                        template: '생성 중..',
-                        duration: 10000
+
+                    $scope.popup = $ionicPopup.show({
+                        template: '<h4 style="text-align:center;">업로드중입니다.. {{loadingStatus}}%</h4><progress max="100" value="{{loadingStatus}}"></progress>',
+                        scope: $scope
                     });
+
+                    // $ionicLoading.show({
+                    //     template: '<progress max="100" value="'+ $scope.loadingStatus +'"></progress>',
+                    //     duration: 60000 * 30
+                    // });
                     $scope.cameraimage = imageURI;
                     $scope.UploadDoc();
                 }, function (err) {
                     console.log(err);
                 });
-            }, false);
+
+            });
         };
 
         $scope.UploadDoc = function () {
@@ -492,10 +539,23 @@ angular.module('xisodip.controllers', [])
             var params = {};
             params.title = options.fileName;
             options.params = params;
+
+            $scope.loadingStatus = 0;
+
             var ft = new FileTransfer();
+            ft.onprogress = function(progressEvent) {
+                if (progressEvent.lengthComputable) {
+                    $scope.loadingStatus = Math.floor(progressEvent.loaded / progressEvent.total * 100);
+                } else {
+                    $scope.loadingStatus = 0;
+                }
+                $scope.$apply();
+                console.log($scope.loadingStatus + '% uploading...');
+            };
             ft.upload(fileURL, encodeURI(ServerInfo.url + "proc.php?module=file&act=procFileUpload"), function (success) {
-                console.log(JSON.stringify(success));
-                $ionicLoading.hide();   //hide Loading
+                // console.log(JSON.stringify(success));
+                // $ionicLoading.hide();   //hide Loading
+                $scope.popup.close();
 
                 var obj = eval("("+success.response+")");
                 if(obj.error != "0") {
@@ -507,7 +567,9 @@ angular.module('xisodip.controllers', [])
                     // $rootScope.member_info = $localStorage.member_info;
                 }
             }, function (error) {
-                $ionicLoading.hide();
+                // $ionicLoading.hide();
+                $scope.popup.close();
+
                 console.log(error);
                 Toast("파일 업로드를 실패하였습니다.");
             }, options);
@@ -519,6 +581,17 @@ angular.module('xisodip.controllers', [])
                 console.log(res);
                 if(res.data.message) Toast(res.data.message);
             },function(res){ console.log(res); });
+        };
+        
+        $scope.saveClip = function(clip){
+            var selectClip = angular.copy(clip);
+            xiHttp.send('file','procModifyFileInfo', selectClip).then(function(res){
+                console.log(res);
+                $scope.closeTimeEdit();
+            },function(err){
+                console.log(err);
+                $scope.closeTimeEdit();
+            });
         };
 
         // 다른 시퀀스로 변경 modal

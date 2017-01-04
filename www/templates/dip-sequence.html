@@ -10,13 +10,13 @@
       <ion-item class="item-remove-animate item-thumbnail-left item-icon-right" ng-repeat="sequence in sequences" type="item-text-wrap" ng-click="goEdit(sequence.seq_srl)">
         <img ng-src="{{sequence.main_img.thumb_filename | makeImgSrc}}" height="30">
         <h2>{{sequence.title}}</h2>
-        <br />
         <p>{{sequence.text_clip}}</p>
+        <p class="help-block"><b>카운트</b> {{sequence.view_count}}</p>
         <p class="help-block"><b>러닝타임</b> {{sequence.total_time | toTime}}</p>
         <i class="icon ion-chevron-right icon-accessory"></i>
 
         <ion-option-button class="button-assertive" ng-click="remove(sequence)">
-          Delete
+          삭제
         </ion-option-button>
       </ion-item>
     </ion-list>

@@ -278,11 +278,18 @@ angular.module('xisodip.services', [])
                 });
             }
 
+            // 로그인 되어있는지 확인
             xiHttp.send('member', 'dispLoggedInfo')
                 .then(function(res){
                     if(res.data.member_srl > 0) {
-                        _user = res.data;
-                        window.localStorage['session'] = JSON.stringify(_user);
+                        var temp_user = null;
+                        if(window.localStorage['session']) temp_user = JSON.parse(window.localStorage['session']);
+
+                        var data = res.data;
+                        if(temp_user) data.password = temp_user.password;
+
+                        setUser(data);
+
                         $state.go('dip.device');
                     }else{
                         _user = null;

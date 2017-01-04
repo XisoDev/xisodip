@@ -18,6 +18,7 @@
             <ion-list show-reorder="shouldShowReorder" style="pointer-events: auto;">
                 <ion-item class="item-remove-animate item-thumbnail-left item-icon-right" ng-repeat="play_list in sequence.timeline">
                     <img ng-src="{{play_list.thumb_filename | makeImgSrc}}" ng-click="showTimeEdit(play_list)" />
+                    <span class="qr_icon" ng-class="{qr_ok: play_list.is_show_qr == 'Y'}">QR</span>
                     <h2>
                         {{play_list.title}}
                     </h2>
@@ -25,12 +26,12 @@
                         {{play_list.file_type}}
                     </p>
                     <p class="help-block">
-                        <b>러닝타임</b>
-                        {{play_list.duration}} 초
+                        <b>카운트</b>
+                        {{play_list.view_count}}
                     </p>
                     <p class="help-block">
-                        <b>전환효과</b>
-                        {{play_list.transition}}
+                        <b>러닝타임</b>
+                        {{play_list.duration}} 초
                     </p>
 
                     <ion-option-button class="button-assertive" ng-click="removeTimeline($index)">
@@ -72,7 +73,7 @@
                 </div>
                 <div class="padding" ng-if="false">
                     <button class="button button-block button-positive button-small">
-                        빈 시퀀스 생성
+                        시퀀스 생성
                     </button>
                 </div>
             </ion-content>
@@ -150,7 +151,7 @@
                 </div>
                 <div class="list card">
                     <div class="item">
-                        <h2>{{selectClip.title}}</h2>
+                        <input type="text" ng-model="selectClip.title" style="font-size:14px;" >
                         <p>{{selectClip.file_type}}</p>
                     </div>
 
@@ -169,15 +170,15 @@
                     </label>
                     <label class="item item-input">
                         <span class="input-label">링크</span>
-                        <input type="text" placeholder="http://softgear.co.kr (예)">
+                        <input type="text" placeholder="http://softgear.co.kr (예)" ng-model="selectClip.url">
                     </label>
                     <label class="item item-input">
                         <span class="input-label">QR코드</span>
-                        <select><option>예</option><option>아니오</option></select>
+                        <select ng-model="selectClip.is_show_qr"><option value="Y">예</option><option value="N">아니오</option></select>
                     </label>
                 </div>
                 <div class="padding">
-                    <button class="button button-block button-positive button-small" ng-click="closeTimeEdit()">
+                    <button class="button button-block button-positive button-small" ng-click="saveClip(selectClip)">
                         완료
                     </button>
                 </div>
