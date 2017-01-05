@@ -121,7 +121,7 @@
                 <ion-list>
                     <ion-item class="item-remove-animate item-thumbnail-left item-icon-right" ng-repeat="clip in clips | filter:search:strict" type="item-text-wrap" ng-click="addTimeline(clip)">
                         <img ng-src="{{clip.thumb_filename | makeImgSrc}}" height="30">
-                        <h2 style="position: relative;">{{clip.title}}<button class="button button-small button-calm" style="position: absolute; right:0;">QR</button></h2>
+                        <h2 style="position: relative;">{{clip.title}}<span class="qr_icon" ng-class="{qr_ok: clip.is_show_qr == 'Y'}">QR</span></h2>
                         <br/>
                         <p class="help-block">{{clip.file_type}}</p>
                         <p class="help-block">{{clip.source_filename}}</p>

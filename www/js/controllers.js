@@ -49,28 +49,38 @@ angular.module('xisodip.controllers', [])
         };
     })
 
+    // 플레이어 목록
     .controller('deviceCtrl', function($scope, $ionicModal, Player, mHttp, xiHttp, ServerInfo, Toast, Auth) {
-        $scope.$on('$stateChangeSuccess', function(){
-            $scope.devices = [];
-            $scope.page = 1;
-            $scope.moreDataCanBeLoaded = false;
+        $scope.$on('$ionicView.enter', function(e) {
+            console.log('deviceCtrl enter');
             $scope.init();
         });
-        $scope.params = {};
-        $scope.devices = [];
-        $scope.page = 1;
-        $scope.moreDataCanBeLoaded = true;
-
+        // $scope.$on('$stateChangeSuccess', function(){
+        // });
         $scope.init = function(){
-            Player.all($scope.page).then(function(res){
-                for(var key in res.data.list) {
-                    $scope.devices.push(res.data.list[key]);    // 기존 배열에 추가
-                }
+            $scope.params = {};
+            $scope.devices = [];
+            $scope.page = 1;
+            $scope.moreDataCanBeLoaded = true;
 
+            $scope.getPlayer();
+        };
+        
+        $scope.getPlayer = function() {
+            Player.all($scope.page).then(function(res){
+                // console.log(res);
                 if(res.data.list) {
+                    if($scope.page == 1) {
+                        $scope.devices = res.data.list;
+                    }else{
+                        for (var key in res.data.list) {
+                            $scope.devices.push(res.data.list[key]);    // 기존 배열에 추가
+                        }
+                    }
+
                     $scope.page++;
                 }else{
-                    if($scope.page > 1) $scope.page--;
+                    // if($scope.page > 1) $scope.page--;
                     $scope.moreDataCanBeLoaded = false;
                 }
 
@@ -78,18 +88,14 @@ angular.module('xisodip.controllers', [])
             },function(res){
                 console.log(res);
             });
-
-        };
-
-        $scope.remove = function(device) {
-            // Player.remove(device);
         };
 
         $scope.loadMore = function() {  // 최초 한번 자동 실행됨
-            console.log('load more');
-            $scope.init();
+            setTimeout(function(){
+                $scope.getPlayer();
+            },700);
         };
-        
+
         $scope.savePlayer = function() {
 
             $scope.params.device_info = Auth.getDeviceInfo();
@@ -126,6 +132,10 @@ angular.module('xisodip.controllers', [])
             },function(res){ console.log(res); });
         };
 
+        $scope.remove = function(device) {
+            // Player.remove(device);
+        };
+
         $ionicModal.fromTemplateUrl('device-add.html', {
             scope: $scope,
             animation: 'slide-in-up'
@@ -139,24 +149,27 @@ angular.module('xisodip.controllers', [])
 
         $scope.closeAddDevice = function() {
             $scope.mdDeviceAdd.hide();
-        };
+       };
 
     })
 
+    // 플레이어 상세
     .controller('deviceDetailCtrl', function($scope, $stateParams, $state, Player, Seq, $ionicModal, Toast) {
-        $scope.$on('$stateChangeSuccess', function(){
-            $scope.sequences = [];
-            $scope.page = 1;
-            $scope.$apply();
-            $scope.loadMore();
+        $scope.$on('$ionicView.enter', function(e) {
+            console.log('deviceDetailCtrl enter');
+            $scope.init();
         });
 
-        // $scope.device = devices.get($stateParams.deviceSrl);
         $scope.active_tab = 'device';
-        $scope.page = 1;
-        $scope.sequences = [];
-        $scope.moreDataCanBeLoaded = true;
-        $scope.search = {};
+
+        $scope.init = function(){
+            $scope.page = 1;
+            $scope.sequences = [];
+            $scope.moreDataCanBeLoaded = true;
+            $scope.search = {};
+
+            $scope.seqAll();
+        };
 
         if($stateParams.deviceSrl) {
             Player.get($stateParams.deviceSrl).then(function (res) {
@@ -166,34 +179,38 @@ angular.module('xisodip.controllers', [])
                         $scope.sequence = res2.data;
                         // console.log($scope.sequence);
                     });
-
                 }
-
             });
-
         };
 
         $scope.seqAll = function() {
             Seq.all($scope.page).then(function(res){
                 // console.log(res);
-
-                for(var key in res.data.list) {
-                    $scope.sequences.push(res.data.list[key]);    // 기존 배열에 추가
-                }
-
                 if(res.data.list) {
+                    if($scope.page == 1){
+                        $scope.sequences = res.data.list;
+                    }else {
+                        for (var key in res.data.list) {
+                            $scope.sequences.push(res.data.list[key]);    // 기존 배열에 추가
+                        }
+                    }
+
                     $scope.page++;
                 }else{
-                    if($scope.page > 1) $scope.page--;
+                    // if($scope.page > 1) $scope.page--;
                     $scope.moreDataCanBeLoaded = false;
                 }
 
                 $scope.$broadcast('scroll.infiniteScrollComplete');
+            },function(res){
+                console.log(res);
             });
         };
 
         $scope.loadMore = function() {  // 최초 한번 자동 실행됨
-            $scope.seqAll();
+            setTimeout(function(){
+                $scope.seqAll();
+            },700);
         };
 
         // 다른 시퀀스로 변경 modal
@@ -237,28 +254,29 @@ angular.module('xisodip.controllers', [])
 
 
     .controller('sequenceCtrl', function($scope, $ionicModal, $stateParams, Seq, $state, ServerInfo, Toast, $ionicPopup, xiHttp) {
-        $scope.params = {};
-
-        $scope.sequences = [];
-        $scope.page = 1;
-        $scope.moreDataCanBeLoaded = true;
-
-        $scope.$on('$stateChangeSuccess', function(){
+        $scope.$on('$ionicView.enter', function(e) {
+            console.log('sequenceCtrl enter');
             $scope.init();
         });
 
         $scope.init = function(){
+            $scope.params = {};
             $scope.sequences = [];
             $scope.page = 1;
             $scope.moreDataCanBeLoaded = true;
-            $scope.$apply();
-            $scope.loadMore();
+
+            $scope.getSeqAll();
         };
 
-        $scope.loadMore = function(){
-
+        $scope.getSeqAll = function(){
             Seq.all($scope.page).then(function(res){
                 // console.log(res.data);
+
+                if($scope.page==1){
+                    console.log('첫페이지 입니다.');
+                    $scope.sequences = [];
+                }
+
                 for(var key in res.data.list) {
                     $scope.sequences.push(res.data.list[key]);    // 기존 배열에 추가
                 }
@@ -274,6 +292,12 @@ angular.module('xisodip.controllers', [])
             },function(res){
                 console.log(res);
             });
+        };
+
+        $scope.loadMore = function(){
+            setTimeout(function(){
+                $scope.getSeqAll();
+            }, 700);
         };
 
         $scope.goEdit = function(seq_srl){
@@ -337,7 +361,7 @@ angular.module('xisodip.controllers', [])
 
     .controller('sequenceDetailCtrl', function($scope, $stateParams, $state, Seq, $ionicActionSheet,$ionicPopup, $timeout, Transition, xiHttp, $ionicModal, File, $cordovaCamera, $ionicPlatform, $ionicLoading, Mime, ServerInfo, Toast) {
         $scope.$on('$ionicView.enter', function(e) {
-            console.log('enter');
+            console.log('sequenceDetailCtrl enter');
             if($stateParams.params.seq_srl) {
                 Seq.get($stateParams.params.seq_srl).then(function (res) {
                     $scope.sequence = res.data;

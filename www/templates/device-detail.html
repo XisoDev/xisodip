@@ -16,7 +16,7 @@
             <div class="whiteBox padding">
               {{device.model}}
             </div>
-            <div class="whiteBox padding" style="border-top:none;">
+            <div class="whiteBox padding" style="border-top:none;" ng-if="device.desc">
               <p class="help-block" ng-bind-html="device.desc | nl2br"></p>
             </div>
             <br />
