@@ -52,7 +52,7 @@ angular.module('xisodip.services', [])
         var self = this;
 
 
-        var baseUrl = 'http://dip.xiso.co.kr/';     // main server URL
+        var baseUrl = 'http://master.softgear.kr/';     // main server URL
         // baseUrl = '/api2/';     // 프록시 서버 사용시 주석 해제
 
         var _finalUrl = '';
