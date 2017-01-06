@@ -73,7 +73,7 @@ angular.module('xisodip', ['ionic', 'ngCordova', 'xisodip.controllers', 'xisodip
             if (days !== 0) timeString += days + '일 ';
             if (hours !== 0) timeString += hours + '시간 ';
             if (minutes !== 0) timeString += minutes + '분 ';
-            if (seconds !== 0) timeString += seconds + '초 ';
+            if (seconds !== 0) timeString += Math.round(seconds) + '초 ';
 
             return timeString;
         };

@@ -31,7 +31,7 @@
                     </p>
                     <p class="help-block">
                         <b>러닝타임</b>
-                        {{play_list.duration}} 초
+                        {{play_list.duration | number:0}} 초
                     </p>
 
                     <ion-option-button class="button-assertive" ng-click="removeTimeline($index)">
@@ -174,7 +174,10 @@
                     </label>
                     <label class="item item-input">
                         <span class="input-label">QR코드</span>
-                        <select ng-model="selectClip.is_show_qr"><option value="Y">예</option><option value="N">아니오</option></select>
+                        <select ng-model="selectClip.is_show_qr">
+                            <option value="Y" ng-selected="selectClip.is_show_qr">예</option>
+                            <option value="N" ng-selected="selectClip.is_show_qr">아니오</option>
+                        </select>
                     </label>
                 </div>
                 <div class="padding">

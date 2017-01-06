@@ -50,7 +50,7 @@ angular.module('xisodip.controllers', [])
     })
 
     // 플레이어 목록
-    .controller('deviceCtrl', function($scope, $ionicModal, Player, mHttp, xiHttp, ServerInfo, Toast, Auth) {
+    .controller('deviceCtrl', function($scope, $ionicModal, Player, mHttp, xiHttp, ServerInfo, Toast, Auth, $ionicPopup) {
         $scope.$on('$ionicView.enter', function(e) {
             console.log('deviceCtrl enter');
             $scope.init();
@@ -132,8 +132,55 @@ angular.module('xisodip.controllers', [])
             },function(res){ console.log(res); });
         };
 
+        var remove_player = function(device){
+            $scope.params.device_info = Auth.getDeviceInfo();
+
+            // console.log('--플레이어--');
+            // console.log(device);
+            // console.log('--관리자앱--');
+            // console.log($scope.params.device_info);
+
+            device.parent_uuid = $scope.params.device_info.uuid;
+
+            // 데이터 서버의 플레이어를 지움
+            xiHttp.send('player','deletePlayer',device).then(function(res){
+                if(res.data.error == 0) {
+                    console.log('data server : ' + res.data.message);
+                    // 메인 서버의 parent_uuid 를 지움
+                    mHttp.send('player','deletePuuid',device).then(function (res2) {
+                        if(res2.data.error == 0){
+                            Toast(res2.data.message);
+                            $scope.init();
+                        }else{
+                            Toast(res2.data.message);
+                        }
+                    }, function (err2) {
+                        Toast('플레이어 삭제를 실패했습니다.');
+                        console.log(err2);
+                    });
+                }else{
+                    Toast(res.data.message);
+                }
+            },function(err){
+                Toast('플레이어 삭제를 실패했습니다.');
+                console.log(err);
+            });
+        };
+
         $scope.remove = function(device) {
-            // Player.remove(device);
+            var confirmPopup = $ionicPopup.confirm({
+                title: '삭제',
+                template: '플레이어를 삭제하시겠습니까?'
+            });
+
+            confirmPopup.then(function(res) {
+                if(res) {
+                    remove_player(device);
+                    // console.log('You are sure');
+                } else {
+                    // console.log('You are not sure');
+                }
+            });
         };
 
         $ionicModal.fromTemplateUrl('device-add.html', {
@@ -509,33 +556,32 @@ angular.module('xisodip.controllers', [])
                         sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
                         mediaType: Camera.MediaType.PICTURE,
                         encodingType: Camera.EncodingType.JPEG,
-                        targetWidth: 300,
-                        targetHeight: 300,
+                        targetWidth: 1920,
+                        targetHeight: 1920,
                         popoverOptions: CameraPopoverOptions,
                         allowEdit: false,
-                        saveToPhotoAlbum: false
+                        saveToPhotoAlbum: false,
+                        correctOrientation: true
                     };
                 }else if(media_type=='video'){
                     options = {
                         quality: 100,
                         destinationType: Camera.DestinationType.FILE_URI,
                         sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
-                        mediaType:Camera.MediaType.VIDEO
+                        mediaType:Camera.MediaType.VIDEO,
+                        correctOrientation: true
                     };
                 }
                 // console.log(options);
 
                 $cordovaCamera.getPicture(options).then(function (imageURI) {
+                    console.log('imageURI = '+ imageURI);
 
                     $scope.popup = $ionicPopup.show({
                         template: '<h4 style="text-align:center;">업로드중입니다.. {{loadingStatus}}%</h4><progress max="100" value="{{loadingStatus}}"></progress>',
                         scope: $scope
                     });
 
-                    // $ionicLoading.show({
-                    //     template: '<progress max="100" value="'+ $scope.loadingStatus +'"></progress>',
-                    //     duration: 60000 * 30
-                    // });
                     $scope.cameraimage = imageURI;
                     $scope.UploadDoc();
                 }, function (err) {
@@ -549,7 +595,7 @@ angular.module('xisodip.controllers', [])
             var fileURL = $scope.cameraimage;
             var fileName = fileURL.substr(fileURL.lastIndexOf('/') + 1);
             if(fileName.lastIndexOf('?') != -1) fileName = fileName.substr(0, fileName.lastIndexOf('?'));
-            var ext = fileURL.substr(fileURL.lastIndexOf('.') + 1);
+            var ext = fileName.substr(fileName.lastIndexOf('.') + 1);
             var mimeType = Mime(ext.toLowerCase());
             console.log('fileName = ' + fileName);
             console.log('mimetype = ' + mimeType);
@@ -585,7 +631,9 @@ angular.module('xisodip.controllers', [])
                 if(obj.error != "0") {
                     Toast(obj.message);
                 }else {
-                    if(obj.file_info) $scope.addTimeline(obj.file_info);
+                    if(obj.file_info) {
+                        $scope.addTimeline(obj.file_info);
+                    }
                     // var random = (new Date()).toString();
                     // $localStorage.member_info.profile_image.src = $rootScope.member_info.profile_image.src + "?cb=" + random;
                     // $rootScope.member_info = $localStorage.member_info;
