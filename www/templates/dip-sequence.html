@@ -1,6 +1,5 @@
 <ion-view view-title="시퀀스 관리">
   <ion-nav-buttons side="primary">
-    <h1 class="title"></h1>
     <div class="buttons">
       <button class="button button-icon" ng-click="showAddSequence()"><i class="icon ion-ios-plus-empty"></i></button>
     </div>
@@ -21,10 +20,10 @@
       </ion-item>
     </ion-list>
 
-    <!--<ion-infinite-scroll-->
-            <!--ng-if="moreDataCanBeLoaded"-->
-            <!--on-infinite="loadMore()">-->
-    <!--</ion-infinite-scroll>-->
+    <ion-infinite-scroll
+            ng-if="moreDataCanBeLoaded"
+            on-infinite="loadMore()">
+    </ion-infinite-scroll>
   </ion-content>
 
   <script id="sequence-add.html" type="text/ng-template">

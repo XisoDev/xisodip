@@ -375,7 +375,7 @@ angular.module('xisodip.services', [])
     .factory('Player', function(xiHttp){
         return {
             all: function(page) {
-                return xiHttp.send('player','dispPlayerListAndSeq',{page: page, list_count: 4});
+                return xiHttp.send('player','dispPlayerListAndSeq',{page: page, list_count: 10});
             },
             get: function(playerSrl) {
                 return xiHttp.send('player','dispPlayer',{player_srl : playerSrl});
@@ -389,7 +389,7 @@ angular.module('xisodip.services', [])
     .factory('Seq', function(xiHttp){
         return {
             all: function(page) {
-                return xiHttp.send('seq','dispSeqList',{page : page, list_count: 4});
+                return xiHttp.send('seq','dispSeqList',{page : page, list_count: 10});
             },
             get: function(seqSrl) {
                 return xiHttp.send('seq','dispSeq',{seq_srl : seqSrl});
@@ -400,7 +400,7 @@ angular.module('xisodip.services', [])
     .factory('File', function(xiHttp){
         return {
             all: function(page) {
-                return xiHttp.send('file','dispFileList',{page : page, list_count: 4});
+                return xiHttp.send('file','dispFileList',{page : page, list_count: 10});
             }
         };
     });
