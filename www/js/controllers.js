@@ -738,6 +738,7 @@ angular.module('xisodip.controllers', [])
         };
         $scope.closeTimeEdit = function() {
             $scope.mdTimeEdit.hide();
+            $scope.selectClip = {};
         };
 
 
