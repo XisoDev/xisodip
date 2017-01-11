@@ -435,6 +435,8 @@ angular.module('xisodip.controllers', [])
         $scope.moreDataCanBeLoaded = true;
         $scope.search = {};
 
+        $scope.tempClip = {};   // 저장실패시 원래 시퀀스로 대체하기 위함
+
         $scope.getClipList = function(){
               File.all($scope.page).then(function(res){
                   for(var key in res.data.list) {
@@ -533,6 +535,7 @@ angular.module('xisodip.controllers', [])
             var cloneClip = angular.copy(clip);
             if(!cloneClip.duration) cloneClip.duration = 3; // 기본 3초
             if(!cloneClip.transition) cloneClip.transition = 'slide-left';  // 기본 전환효과
+            if(!cloneClip.is_show_qr) cloneClip.is_show_qr = 'N';   // 기본 N
             $scope.sequence.timeline.push(cloneClip);
 
             if(!$scope.sequence.main_img) $scope.sequence.main_img = cloneClip; // 대표 이미지가 없다면 대표 이미지로 지정
@@ -634,7 +637,7 @@ angular.module('xisodip.controllers', [])
                 }else {
                     if(obj.file_info) {
                         $scope.addTimeline(obj.file_info);
-                    }saveClip
+                    }
                     // var random = (new Date()).toString();
                     // $localStorage.member_info.profile_image.src = $rootScope.member_info.profile_image.src + "?cb=" + random;
                     // $rootScope.member_info = $localStorage.member_info;
@@ -657,7 +660,15 @@ angular.module('xisodip.controllers', [])
         };
         
         $scope.saveClip = function(clip){
-            $scope.closeTimeEdit();
+
+            var full_url = getFullUrl2(clip.url);
+            if(!checkUrlPattern(full_url)){
+                Toast('URL 형식이 잘못되었습니다.');
+                clip.url = $scope.tempClip.url;
+            }else {
+                clip.url = full_url;
+                $scope.closeTimeEdit();
+            }
             /*
             var selectClip = angular.copy(clip);
             xiHttp.send('file','procModifyFileInfo', selectClip).then(function(res){
@@ -721,6 +732,7 @@ angular.module('xisodip.controllers', [])
         });
         $scope.showTimeEdit = function(clip){
             $scope.selectClip = {};
+            $scope.tempClip = angular.copy(clip);
             if(clip) $scope.selectClip = clip;
             $scope.mdTimeEdit.show();
         };

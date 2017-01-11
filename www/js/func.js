@@ -32,6 +32,18 @@ function getFullUrl(url) {
     return fullUrl;
 }
 
+function getFullUrl2(url) {
+    var fullUrl = url;
+
+    fullUrl = fullUrl.toLowerCase();
+
+    if(fullUrl.indexOf('http://') != 0 && fullUrl.indexOf('https://') != 0){
+        fullUrl = 'http://' + fullUrl;
+    }
+
+    return fullUrl;
+}
+
 function checkUrlPattern(strUrl) {
     var expUrl = /^(https?\:\/\/)?((\w+)[.])+(asia|biz|cc|cn|com|de|eu|in|info|jobs|jp|kr|mobi|mx|name|net|nz|org|travel|tv|tw|uk|us)(\/(\w*))*$/i;
     return expUrl.test(strUrl);
