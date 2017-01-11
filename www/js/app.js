@@ -59,7 +59,7 @@ angular.module('xisodip', ['ionic', 'ngCordova', 'xisodip.controllers', 'xisodip
 
     .filter('toTime', function() {
         return function(seconds) {
-            if(!seconds) return ;
+            if(!seconds) return '0초';
 
             var oneMinute = 60;
             var oneHour = oneMinute * 60;
@@ -73,7 +73,8 @@ angular.module('xisodip', ['ionic', 'ngCordova', 'xisodip.controllers', 'xisodip
             if (days !== 0) timeString += days + '일 ';
             if (hours !== 0) timeString += hours + '시간 ';
             if (minutes !== 0) timeString += minutes + '분 ';
-            if (seconds !== 0) timeString += Math.round(seconds) + '초 ';
+            seconds = seconds % 60;
+            if (seconds !== 0) timeString += Math.round(seconds) + '초';
 
             return timeString;
         };
@@ -94,13 +95,14 @@ angular.module('xisodip', ['ionic', 'ngCordova', 'xisodip.controllers', 'xisodip
         };
     })
 
-    .filter('makeImgSrc', function(ServerInfo){
+    .filter('makeImgSrc', function(ServerInfo, $sce){
         return function(url) {
             if(typeof(url) === 'undefined') return '';
 
-            if(url.indexOf('./files') == 0) url = url.substr(1);
+            if(url.indexOf('./files') == 0) url = url.substr(2);
+            // return ServerInfo.url + url;
 
-            return ServerInfo.url + url;
+            return $sce.trustAsResourceUrl(ServerInfo.url + url);
         }
     })
 

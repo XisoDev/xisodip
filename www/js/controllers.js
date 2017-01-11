@@ -148,6 +148,7 @@ angular.module('xisodip.controllers', [])
                     console.log('data server : ' + res.data.message);
                     // 메인 서버의 parent_uuid 를 지움
                     mHttp.send('player','deletePuuid',device).then(function (res2) {
+                        console.log(res2);
                         if(res2.data.error == 0){
                             Toast(res2.data.message);
                             $scope.init();
@@ -633,7 +634,7 @@ angular.module('xisodip.controllers', [])
                 }else {
                     if(obj.file_info) {
                         $scope.addTimeline(obj.file_info);
-                    }
+                    }saveClip
                     // var random = (new Date()).toString();
                     // $localStorage.member_info.profile_image.src = $rootScope.member_info.profile_image.src + "?cb=" + random;
                     // $rootScope.member_info = $localStorage.member_info;
@@ -656,6 +657,8 @@ angular.module('xisodip.controllers', [])
         };
         
         $scope.saveClip = function(clip){
+            $scope.closeTimeEdit();
+            /*
             var selectClip = angular.copy(clip);
             xiHttp.send('file','procModifyFileInfo', selectClip).then(function(res){
                 console.log(res);
@@ -664,6 +667,7 @@ angular.module('xisodip.controllers', [])
                 console.log(err);
                 $scope.closeTimeEdit();
             });
+            */
         };
 
         // 다른 시퀀스로 변경 modal
@@ -727,8 +731,7 @@ angular.module('xisodip.controllers', [])
 
     })
 
-    .controller('configCtrl', function($scope, $state, Auth, Toast, ServerInfo) {
-
+    .controller('configCtrl', function($scope, $state, Auth, Toast) {
         $scope.goServer = function() {
             $state.go('dip.config-server');
         };
@@ -744,6 +747,8 @@ angular.module('xisodip.controllers', [])
     })
 
     .controller('configServerCtrl', function($scope, ServerInfo) {
+        $scope.serverInfo = ServerInfo;
+
         $scope.params = {};
         $scope.params.url = angular.copy(ServerInfo.url);
     });

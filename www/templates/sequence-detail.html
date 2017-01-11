@@ -4,7 +4,7 @@
         <button class="button button-clear" ng-click="showMainImg()">대표이미지</button>
     </ion-nav-buttons>
 
-    <div class="cover_image" style="background-image:url('{{sequence.main_img.thumb_filename || '/files/no_image.png' | makeImgSrc}}');" ng-click="showSeqEdit()"></div>
+    <div class="cover_image" style="background-image:url('{{sequence.main_img.thumb_filename || './files/no_image.png' | makeImgSrc}}');"></div>
     <ion-content class="padding">
         <div class="padding has_cover">
             <h5>Notice <i class="ion-edit" ng-click="showSeqEdit()" style="color:#999;"></i></h5>
@@ -31,7 +31,7 @@
                     </p>
                     <p class="help-block">
                         <b>러닝타임</b>
-                        {{play_list.duration | number:0}} 초
+                        {{play_list.duration | toTime}}
                     </p>
 
                     <ion-option-button class="button-assertive" ng-click="removeTimeline($index)">
@@ -156,12 +156,16 @@
                     </div>
 
                     <div class="item item-image">
-                        <img ng-src="{{selectClip.thumb_filename | makeImgSrc}}">
+                        <img ng-src="{{selectClip.thumb_filename | makeImgSrc}}" ng-if="selectClip.file_type.indexOf('image')==0">
+                        <video controls width="100%" ng-if="selectClip.file_type.indexOf('video')==0">
+                            <source ng-src="{{selectClip.uploaded_filename | makeImgSrc}}" type="{{selectClip.file_type}}">
+                            비디오플레이가 지원되지 않습니다. 브라우저를 업데이트하세요.
+                        </video>
                     </div>
 
                     <label class="item item-input">
                         <span class="input-label">러닝타임</span>
-                        <span ng-show="selectClip.file_type.indexOf('video') == 0" style="color:gray;">{{selectClip.duration}}</span>
+                        <span ng-show="selectClip.file_type.indexOf('video') == 0" style="color:gray;">{{selectClip.duration | number:0}}</span>
                         <input ng-show="selectClip.file_type.indexOf('video') != 0" type="text" placeholder="러닝타임(초)" ng-model="selectClip.duration" >
                     </label>
                     <label class="item item-input">
@@ -175,8 +179,8 @@
                     <label class="item item-input">
                         <span class="input-label">QR코드</span>
                         <select ng-model="selectClip.is_show_qr">
-                            <option value="Y" ng-selected="selectClip.is_show_qr">예</option>
-                            <option value="N" ng-selected="selectClip.is_show_qr">아니오</option>
+                            <option value="Y" ng-selected="selectClip.is_show_qr=='Y'">예</option>
+                            <option value="N" ng-selected="selectClip.is_show_qr!='Y'">아니오</option>
                         </select>
                     </label>
                 </div>

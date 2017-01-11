@@ -7,10 +7,22 @@
         "files": {}
     },
     "installed_plugins": {
+        "cordova-plugin-camera": {
+            "PACKAGE_NAME": "com.ionicframework.xisodip849942"
+        },
         "cordova-plugin-console": {
             "PACKAGE_NAME": "com.ionicframework.xisodip849942"
         },
         "cordova-plugin-device": {
+            "PACKAGE_NAME": "com.ionicframework.xisodip849942"
+        },
+        "cordova-plugin-file": {
+            "PACKAGE_NAME": "com.ionicframework.xisodip849942"
+        },
+        "cordova-plugin-file-transfer": {
+            "PACKAGE_NAME": "com.ionicframework.xisodip849942"
+        },
+        "cordova-plugin-inappbrowser": {
             "PACKAGE_NAME": "com.ionicframework.xisodip849942"
         },
         "cordova-plugin-splashscreen": {
@@ -26,18 +38,6 @@
             "PACKAGE_NAME": "com.ionicframework.xisodip849942"
         },
         "ionic-plugin-keyboard": {
-            "PACKAGE_NAME": "com.ionicframework.xisodip849942"
-        },
-        "cordova-plugin-camera": {
-            "PACKAGE_NAME": "com.ionicframework.xisodip849942"
-        },
-        "cordova-plugin-file": {
-            "PACKAGE_NAME": "com.ionicframework.xisodip849942"
-        },
-        "cordova-plugin-file-transfer": {
-            "PACKAGE_NAME": "com.ionicframework.xisodip849942"
-        },
-        "cordova-plugin-inappbrowser": {
             "PACKAGE_NAME": "com.ionicframework.xisodip849942"
         }
     },

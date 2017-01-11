@@ -1,5 +1,5 @@
 <ion-view view-title="플레이어 관리">
-  <ion-nav-buttons side="primary">
+  <ion-nav-buttons side="right">
       <div class="buttons">
         <button class="button button-icon" ng-click="showAddDevice()"><i class="icon ion-ios-plus-empty"></i></button>
       </div>
@@ -7,7 +7,7 @@
   <ion-content>
     <ion-list show-delete="shouldShowDelete">
       <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="device in devices" type="item-text-wrap" href="#/dip/deviceDetail/{{device.player_srl}}">
-        <img ng-src="{{device.seq_main_img.thumb_filename || '/files/no_image.png' | makeImgSrc}}">
+        <img ng-src="{{device.seq_main_img.thumb_filename || './files/no_image.png' | makeImgSrc}}">
         <h2>{{device.title}}</h2>
         <p>{{device.seq_title || '선택된 시퀀스가 없습니다'}}</p>
         <i class="icon ion-chevron-right icon-accessory"></i>
