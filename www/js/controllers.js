@@ -662,13 +662,13 @@ angular.module('xisodip.controllers', [])
         $scope.saveClip = function(clip){
 
             var full_url = getFullUrl2(clip.url);
-            if(!checkUrlPattern(full_url)){
-                Toast('URL 형식이 잘못되었습니다.');
-                clip.url = $scope.tempClip.url;
-            }else {
+            // if(!checkUrlPattern(full_url)){
+            //     Toast('URL 형식이 잘못되었습니다.');
+            //     clip.url = $scope.tempClip.url;
+            // }else {
                 clip.url = full_url;
                 $scope.closeTimeEdit();
-            }
+            // }
             /*
             var selectClip = angular.copy(clip);
             xiHttp.send('file','procModifyFileInfo', selectClip).then(function(res){
