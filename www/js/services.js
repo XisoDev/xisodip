@@ -302,8 +302,22 @@ angular.module('xisodip.services', [])
         };
 
         var isLogged = function() {
-            if(_user) return true;
-            else return false;
+            return _user;
+        };
+
+        var checkSession = function() {
+            xiHttp.send('member', 'dispLoggedInfo')
+                .then(function(res){
+                    if(res.data.member_srl > 0) {
+                        console.log('session 있음');
+                    }else{
+                        console.log('session 없음');
+                        $state.go('login');
+                    }
+                },function(err) {
+                    console.log('session 없음');
+                    $state.go('login');
+                });
         };
 
         var getUser = function() {
@@ -351,6 +365,7 @@ angular.module('xisodip.services', [])
             init: init,
             setUser: setUser,
             isLogged: isLogged,
+            checkSession: checkSession,
             getUser: getUser,
             setDeviceInfo: setDeviceInfo,
             getDeviceInfo: getDeviceInfo,

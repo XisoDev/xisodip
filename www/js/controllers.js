@@ -53,6 +53,7 @@ angular.module('xisodip.controllers', [])
     .controller('deviceCtrl', function($scope, $ionicModal, Player, mHttp, xiHttp, ServerInfo, Toast, Auth, $ionicPopup) {
         $scope.$on('$ionicView.enter', function(e) {
             console.log('deviceCtrl enter');
+            Auth.checkSession();
             $scope.init();
         });
         // $scope.$on('$stateChangeSuccess', function(){
@@ -65,7 +66,7 @@ angular.module('xisodip.controllers', [])
 
             $scope.getPlayer();
         };
-        
+
         $scope.getPlayer = function() {
             Player.all($scope.page).then(function(res){
                 // console.log(res);
@@ -301,9 +302,10 @@ angular.module('xisodip.controllers', [])
     })
 
 
-    .controller('sequenceCtrl', function($scope, $ionicModal, $stateParams, Seq, $state, ServerInfo, Toast, $ionicPopup, xiHttp) {
+    .controller('sequenceCtrl', function($scope, $ionicModal, $stateParams, Seq, $state, ServerInfo, Toast, $ionicPopup, xiHttp, Auth) {
         $scope.$on('$ionicView.enter', function(e) {
             console.log('sequenceCtrl enter');
+            Auth.checkSession();
             $scope.init();
         });
 
@@ -407,7 +409,7 @@ angular.module('xisodip.controllers', [])
         };
     })
 
-    .controller('sequenceDetailCtrl', function($scope, $stateParams, $state, Seq, $ionicActionSheet,$ionicPopup, $timeout, Transition, xiHttp, $ionicModal, File, $cordovaCamera, $ionicPlatform, $ionicLoading, Mime, ServerInfo, Toast) {
+    .controller('sequenceDetailCtrl', function($scope, $stateParams, $state, Seq, $ionicActionSheet,$ionicPopup, $timeout, Transition, xiHttp, $ionicModal, File, $cordovaCamera, $ionicPlatform, $ionicLoading, Mime, ServerInfo, Toast, $cordovaFile) {
         $scope.$on('$ionicView.enter', function(e) {
             console.log('sequenceDetailCtrl enter');
             if($stateParams.params.seq_srl) {
@@ -544,7 +546,9 @@ angular.module('xisodip.controllers', [])
         };
 
         $scope.popup = {};
+        $scope.popup2 = {};
         $scope.loadingStatus = 0;
+        $scope.loadingStatus2 = 0;
 
         $scope.getPhotoLib = function (media_type) {
             // $ionicScrollDelegate.scrollTop();
@@ -581,13 +585,8 @@ angular.module('xisodip.controllers', [])
                 $cordovaCamera.getPicture(options).then(function (imageURI) {
                     console.log('imageURI = '+ imageURI);
 
-                    $scope.popup = $ionicPopup.show({
-                        template: '<h4 style="text-align:center;">업로드중입니다.. {{loadingStatus}}%</h4><progress max="100" value="{{loadingStatus}}"></progress>',
-                        scope: $scope
-                    });
-
                     $scope.cameraimage = imageURI;
-                    $scope.UploadDoc();
+                    $scope.transCoding();
                 }, function (err) {
                     console.log(err);
                 });
@@ -595,11 +594,57 @@ angular.module('xisodip.controllers', [])
             });
         };
 
+        $scope.transCoding = function() {
+            var fileURL = $scope.cameraimage;
+            var fileName = fileURL.substr(fileURL.lastIndexOf('/') + 1);
+            if(fileName.lastIndexOf('?') != -1) fileName = fileName.substr(0, fileName.lastIndexOf('?'));
+            var fileFisrtName = fileName.substr(0, fileName.lastIndexOf('.'));
+            var ext = fileName.substr(fileName.lastIndexOf('.') + 1);
+
+            if(ext.toLowerCase() == 'mov') {
+                $scope.loadingStatus2 = 0;
+                $scope.popup2 = $ionicPopup.show({
+                    template: '<h4 style="text-align:center;">인코딩중입니다.. {{loadingStatus2}}%</h4><progress max="100" value="{{loadingStatus2}}"></progress>',
+                    scope: $scope
+                });
+
+                VideoEditor.transcodeVideo(function (success) {
+                    console.log(success);
+                    $scope.popup2.close();
+                    $scope.cameraimage = success;
+
+                    $scope.UploadDoc();
+                }, function (error) {
+                    console.log(error);
+                    $scope.popup2.close();
+                }, {
+                    fileUri: fileURL,
+                    outputFileName: fileFisrtName,
+                    outputFIleType: VideoEditorOptions.OutputFileType.MPEG4,
+                    saveToLibrary : false,
+                    progress: function (info) {
+                        $scope.loadingStatus2 = Math.floor(info);
+                        $scope.$apply();
+                    }
+                });
+            }else if(ext.toLowerCase() == '3gp') {
+                Toast('지원하지 않는 파일 형식입니다.');
+            }else{
+                $scope.UploadDoc();
+            }
+        };
+
         $scope.UploadDoc = function () {
+            $scope.popup = $ionicPopup.show({
+                template: '<h4 style="text-align:center;">업로드중입니다.. {{loadingStatus}}%</h4><progress max="100" value="{{loadingStatus}}"></progress>',
+                scope: $scope
+            });
+
             var fileURL = $scope.cameraimage;
             var fileName = fileURL.substr(fileURL.lastIndexOf('/') + 1);
             if(fileName.lastIndexOf('?') != -1) fileName = fileName.substr(0, fileName.lastIndexOf('?'));
             var ext = fileName.substr(fileName.lastIndexOf('.') + 1);
+
             var mimeType = Mime(ext.toLowerCase());
             console.log('fileName = ' + fileName);
             console.log('mimetype = ' + mimeType);
@@ -624,7 +669,7 @@ angular.module('xisodip.controllers', [])
                     $scope.loadingStatus = 0;
                 }
                 $scope.$apply();
-                console.log($scope.loadingStatus + '% uploading...');
+                // console.log($scope.loadingStatus + '% uploading...');
             };
             ft.upload(fileURL, encodeURI(ServerInfo.url + "proc.php?module=file&act=procFileUpload"), function (success) {
                 // console.log(JSON.stringify(success));
@@ -658,27 +703,36 @@ angular.module('xisodip.controllers', [])
                 if(res.data.message) Toast(res.data.message);
             },function(res){ console.log(res); });
         };
-        
-        $scope.saveClip = function(clip){
 
-            var full_url = getFullUrl2(clip.url);
-            // if(!checkUrlPattern(full_url)){
-            //     Toast('URL 형식이 잘못되었습니다.');
-            //     clip.url = $scope.tempClip.url;
-            // }else {
+        $scope.saveClip = function(clip){
+            if(!clip.transition) {
+                Toast('전환효과를 선택해주세요.');
+                return false;
+            }
+
+            if(clip.url) {
+                var full_url = getFullUrl2(clip.url);
+                // if(!checkUrlPattern(full_url)){
+                //     Toast('URL 형식이 잘못되었습니다.');
+                //     clip.url = $scope.tempClip.url;
+                // }else {
                 clip.url = full_url;
-                $scope.closeTimeEdit();
-            // }
-            /*
-            var selectClip = angular.copy(clip);
-            xiHttp.send('file','procModifyFileInfo', selectClip).then(function(res){
-                console.log(res);
-                $scope.closeTimeEdit();
-            },function(err){
-                console.log(err);
-                $scope.closeTimeEdit();
-            });
-            */
+                // }
+                /*
+                 var selectClip = angular.copy(clip);
+                 xiHttp.send('file','procModifyFileInfo', selectClip).then(function(res){
+                 console.log(res);
+                 $scope.closeTimeEdit();
+                 },function(err){
+                 console.log(err);
+                 $scope.closeTimeEdit();
+                 });
+                 */
+            }else{
+                clip.is_show_qr = 'N';
+            }
+
+            $scope.closeTimeEdit();
         };
 
         // 다른 시퀀스로 변경 modal
@@ -745,6 +799,10 @@ angular.module('xisodip.controllers', [])
     })
 
     .controller('configCtrl', function($scope, $state, Auth, Toast) {
+        $scope.$on('$ionicView.enter', function(e) {
+            Auth.checkSession();
+        });
+
         $scope.goServer = function() {
             $state.go('dip.config-server');
         };
@@ -760,6 +818,10 @@ angular.module('xisodip.controllers', [])
     })
 
     .controller('configServerCtrl', function($scope, ServerInfo) {
+        $scope.$on('$ionicView.enter', function(e) {
+            Auth.checkSession();
+        });
+
         $scope.serverInfo = ServerInfo;
 
         $scope.params = {};
